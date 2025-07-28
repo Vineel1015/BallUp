@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Database
+*.sqlite
+*.db
+
+# Build outputs
+dist/
+build/
+out/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# React Native
+# Xcode
+ios/build/
+ios/Pods/
+*.xcworkspace
+*.xcuserstate
+*.hmap
+*.ipa
+
+# Android
+android/app/build/
+android/build/
+*.keystore
+*.jks
+
+# Metro
+.metro-health-check*
+
+# Flipper
+ios/Pods/Flipper
+ios/Pods/Flipper-*
+ios/Pods/FlipperKit
+android/app/src/debug/java/com/*/ReactNativeFlipper.java
+
+# Bundle artifacts
+*.jsbundle
+
+# CocoaPods
+ios/Pods/

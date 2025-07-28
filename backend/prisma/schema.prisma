@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  password    String
+  profilePicture String?
+  skillLevel  String?  @default("beginner")
+  preferredPosition String?
+  bio         String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  createdLocations Location[] @relation("LocationCreator")
+  createdGames     Game[]     @relation("GameCreator")
+  gameParticipants GameParticipant[]
+
+  @@map("users")
+}
+
+model Location {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  latitude    Float
+  longitude   Float
+  description String?
+  amenities   String[] @default([])
+  photos      String[] @default([])
+  rating      Float?   @default(0)
+  isVerified  Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator User   @relation("LocationCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  games   Game[]
+
+  @@map("locations")
+}
+
+model Game {
+  id                  String   @id @default(cuid())
+  locationId          String
+  creatorId           String
+  scheduledTime       DateTime
+  duration            Int      // Duration in minutes
+  maxPlayers          Int      @default(10)
+  currentPlayers      Int      @default(0)
+  skillLevelRequired  String?  @default("any")
+  description         String?
+  status              String   @default("scheduled") // scheduled, active, completed, cancelled
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  // Relations
+  location     Location          @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  creator      User              @relation("GameCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  participants GameParticipant[]
+
+  @@map("games")
+}
+
+model GameParticipant {
+  id       String   @id @default(cuid())
+  gameId   String
+  userId   String
+  joinedAt DateTime @default(now())
+  status   String   @default("confirmed") // confirmed, pending, cancelled
+
+  // Relations
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, userId])
+  @@map("game_participants")
+}
