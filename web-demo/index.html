@@ -311,19 +311,25 @@
                 <div class="action-description">Search for pickup games near you</div>
             </button>
             
+            <button class="action-button" onclick="showScreen('create-game-screen')">
+                <div class="action-icon">🏀</div>
+                <div class="action-title">Create Game</div>
+                <div class="action-description">Organize a new pickup game</div>
+            </button>
+            
             <button class="action-button" onclick="showScreen('create-location-screen')">
                 <div class="action-icon">📍</div>
                 <div class="action-title">Add Court</div>
                 <div class="action-description">Add a new basketball court location</div>
             </button>
             
-            <button class="action-button">
+            <button class="action-button" onclick="showScreen('profile-screen')">
                 <div class="action-icon">👤</div>
                 <div class="action-title">My Profile</div>
                 <div class="action-description">View and edit your profile</div>
             </button>
             
-            <button class="action-button">
+            <button class="action-button" onclick="showScreen('my-games-screen')">
                 <div class="action-icon">📅</div>
                 <div class="action-title">My Games</div>
                 <div class="action-description">View your upcoming and past games</div>
@@ -370,6 +376,71 @@
             </div>
         </div>
 
+        <!-- Create Game Screen -->
+        <div class="screen" id="create-game-screen">
+            <div class="nav-header">
+                <button class="back-btn" onclick="showScreen('home-screen')">←</button>
+                <div class="nav-title">Create Game</div>
+            </div>
+            
+            <div class="title" style="font-size: 28px;">Organize a Game</div>
+            <div class="subtitle">Set up a pickup game for other players to join</div>
+            
+            <div class="form">
+                <div class="input-group">
+                    <label class="label">Select Court *</label>
+                    <select class="input" id="game-location-select">
+                        <option value="">Choose a court...</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Date & Time *</label>
+                    <input type="datetime-local" class="input" id="game-datetime">
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Duration (minutes) *</label>
+                    <select class="input" id="game-duration">
+                        <option value="60">1 hour</option>
+                        <option value="90" selected>1.5 hours</option>
+                        <option value="120">2 hours</option>
+                        <option value="150">2.5 hours</option>
+                        <option value="180">3 hours</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Max Players *</label>
+                    <select class="input" id="game-max-players">
+                        <option value="6">6 players</option>
+                        <option value="8" selected>8 players</option>
+                        <option value="10">10 players</option>
+                        <option value="12">12 players</option>
+                        <option value="14">14 players</option>
+                        <option value="16">16 players</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Skill Level</label>
+                    <select class="input" id="game-skill-level">
+                        <option value="">Any skill level</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Description</label>
+                    <textarea class="input textarea" id="game-description" placeholder="Describe your game, what to expect, etc."></textarea>
+                </div>
+                
+                <button class="button" onclick="createGame()">Create Game</button>
+            </div>
+        </div>
+
         <!-- Create Location Screen -->
         <div class="screen" id="create-location-screen">
             <div class="nav-header">
@@ -413,6 +484,73 @@
                 <button class="button" onclick="addCourt()">Add Court</button>
             </div>
         </div>
+
+        <!-- Profile Screen -->
+        <div class="screen" id="profile-screen">
+            <div class="nav-header">
+                <button class="back-btn" onclick="showScreen('home-screen')">←</button>
+                <div class="nav-title">My Profile</div>
+            </div>
+            
+            <div class="title" style="font-size: 28px;">Player Profile</div>
+            <div class="subtitle">Manage your basketball profile</div>
+            
+            <div class="form">
+                <div class="input-group">
+                    <label class="label">Username</label>
+                    <input type="text" class="input" id="profile-username" readonly>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Email</label>
+                    <input type="email" class="input" id="profile-email" readonly>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Skill Level</label>
+                    <select class="input" id="profile-skill-level">
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Preferred Position</label>
+                    <select class="input" id="profile-position">
+                        <option value="">No preference</option>
+                        <option value="Point Guard">Point Guard</option>
+                        <option value="Shooting Guard">Shooting Guard</option>
+                        <option value="Small Forward">Small Forward</option>
+                        <option value="Power Forward">Power Forward</option>
+                        <option value="Center">Center</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Bio</label>
+                    <textarea class="input textarea" id="profile-bio" placeholder="Tell other players about yourself..."></textarea>
+                </div>
+                
+                <button class="button" onclick="updateProfile()">Update Profile</button>
+                <button class="button button-outline" onclick="logout()" style="margin-top: 16px;">Logout</button>
+            </div>
+        </div>
+
+        <!-- My Games Screen -->
+        <div class="screen" id="my-games-screen">
+            <div class="nav-header">
+                <button class="back-btn" onclick="showScreen('home-screen')">←</button>
+                <div class="nav-title">My Games</div>
+            </div>
+            
+            <div class="title" style="font-size: 28px;">My Games</div>
+            <div class="subtitle">Your created and joined games</div>
+            
+            <div id="my-games-container">
+                <!-- Games will be loaded here -->
+            </div>
+        </div>
     </div>
 
     <script>
@@ -428,6 +566,12 @@
             // Load data when entering specific screens
             if (screenId === 'game-search-screen') {
                 loadGames();
+            } else if (screenId === 'create-game-screen') {
+                loadLocationsForGame();
+            } else if (screenId === 'profile-screen') {
+                loadUserProfile();
+            } else if (screenId === 'my-games-screen') {
+                loadMyGames();
             }
         }
 
@@ -646,6 +790,294 @@
                 }
             } catch (error) {
                 alert('Connection error. Make sure the backend is running.');
+            }
+        }
+
+        async function loadLocationsForGame() {
+            try {
+                const response = await fetch('http://localhost:3000/api/locations');
+                const locations = await response.json();
+                
+                const select = document.getElementById('game-location-select');
+                select.innerHTML = '<option value="">Choose a court...</option>';
+                
+                locations.forEach(location => {
+                    const option = document.createElement('option');
+                    option.value = location.id;
+                    option.textContent = location.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading locations:', error);
+            }
+        }
+
+        async function createGame() {
+            const locationId = document.getElementById('game-location-select').value;
+            const datetime = document.getElementById('game-datetime').value;
+            const duration = parseInt(document.getElementById('game-duration').value);
+            const maxPlayers = parseInt(document.getElementById('game-max-players').value);
+            const skillLevel = document.getElementById('game-skill-level').value;
+            const description = document.getElementById('game-description').value;
+            
+            if (!locationId || !datetime || !duration || !maxPlayers) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to create a game');
+                showScreen('login-screen');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/games', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        locationId,
+                        scheduledTime: datetime,
+                        duration,
+                        maxPlayers,
+                        skillLevelRequired: skillLevel || null,
+                        description
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Game created successfully!');
+                    // Clear form
+                    document.getElementById('game-location-select').value = '';
+                    document.getElementById('game-datetime').value = '';
+                    document.getElementById('game-duration').value = '90';
+                    document.getElementById('game-max-players').value = '8';
+                    document.getElementById('game-skill-level').value = '';
+                    document.getElementById('game-description').value = '';
+                    showScreen('home-screen');
+                } else {
+                    alert(data.error || 'Failed to create game');
+                }
+            } catch (error) {
+                alert('Connection error. Make sure the backend is running.');
+            }
+        }
+
+        async function loadUserProfile() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showScreen('login-screen');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('profile-username').value = user.username || '';
+                    document.getElementById('profile-email').value = user.email || '';
+                    document.getElementById('profile-skill-level').value = user.skillLevel || 'beginner';
+                    document.getElementById('profile-position').value = user.preferredPosition || '';
+                    document.getElementById('profile-bio').value = user.bio || '';
+                } else {
+                    showScreen('login-screen');
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                showScreen('login-screen');
+            }
+        }
+
+        async function updateProfile() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to update your profile');
+                showScreen('login-screen');
+                return;
+            }
+            
+            const skillLevel = document.getElementById('profile-skill-level').value;
+            const preferredPosition = document.getElementById('profile-position').value;
+            const bio = document.getElementById('profile-bio').value;
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/users/me', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        skillLevel,
+                        preferredPosition,
+                        bio
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Update localStorage with new user data
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    alert('Profile updated successfully!');
+                } else {
+                    alert(data.error || 'Failed to update profile');
+                }
+            } catch (error) {
+                alert('Connection error. Make sure the backend is running.');
+            }
+        }
+
+        async function loadMyGames() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                showScreen('login-screen');
+                return;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/games');
+                const allGames = await response.json();
+                
+                // Filter games where user is creator or participant
+                const myGames = allGames.filter(game => 
+                    game.creatorId === user.id || 
+                    game.participants.some(p => p.userId === user.id)
+                );
+                
+                const container = document.getElementById('my-games-container');
+                container.innerHTML = '';
+                
+                if (myGames.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No games yet. Create or join a game!</p>';
+                    return;
+                }
+                
+                myGames.forEach(game => {
+                    const gameCard = document.createElement('div');
+                    gameCard.className = 'game-card';
+                    
+                    const gameTime = new Date(game.scheduledTime).toLocaleDateString('en-US', {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit',
+                    });
+                    
+                    const isCreator = game.creatorId === user.id;
+                    const role = isCreator ? 'Creator' : 'Participant';
+                    
+                    gameCard.innerHTML = `
+                        <div class="game-header">
+                            <div class="location-name">${game.location.name}</div>
+                            <div class="game-time">${gameTime}</div>
+                        </div>
+                        <div class="game-description">${game.description || 'No description provided'}</div>
+                        <div class="game-details">
+                            <span>Players: ${game.currentPlayers}/${game.maxPlayers}</span>
+                            <span>Duration: ${game.duration} min</span>
+                            <span class="skill-level">Role: ${role}</span>
+                        </div>
+                        ${isCreator ? 
+                            `<button class="button button-outline" onclick="cancelGame('${game.id}')">Cancel Game</button>` :
+                            `<button class="button button-outline" onclick="leaveGame('${game.id}')">Leave Game</button>`
+                        }
+                    `;
+                    
+                    container.appendChild(gameCard);
+                });
+            } catch (error) {
+                console.error('Error loading my games:', error);
+            }
+        }
+
+        async function leaveGame(gameId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to leave a game');
+                showScreen('login-screen');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to leave this game?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/games/leave', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ gameId })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Successfully left the game');
+                    loadMyGames(); // Refresh the list
+                } else {
+                    alert(data.error || 'Failed to leave game');
+                }
+            } catch (error) {
+                alert('Connection error. Make sure the backend is running.');
+            }
+        }
+
+        async function cancelGame(gameId) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please log in to cancel a game');
+                showScreen('login-screen');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to cancel this game? This will notify all participants.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`http://localhost:3000/api/games/${gameId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Game cancelled successfully');
+                    loadMyGames(); // Refresh the list
+                } else {
+                    alert(data.error || 'Failed to cancel game');
+                }
+            } catch (error) {
+                alert('Connection error. Make sure the backend is running.');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                showScreen('login-screen');
             }
         }
 
