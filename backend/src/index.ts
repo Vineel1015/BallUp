@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth';
+import locationRoutes from './routes/locations';
+import gameRoutes from './routes/games';
 
 dotenv.config();
 
@@ -25,6 +27,8 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/games', gameRoutes);
 
 app.listen(PORT, () => {
   console.log(`🏀 BallUp API server is running on port ${PORT}`);

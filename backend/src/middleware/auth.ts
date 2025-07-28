@@ -31,7 +31,9 @@ export const authenticateToken = (
 };
 
 export const generateToken = (payload: { id: string; email: string }) => {
-  return jwt.sign(payload, process.env.JWT_SECRET || 'fallback-secret', {
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-  });
+  return jwt.sign(
+    payload, 
+    process.env.JWT_SECRET || 'fallback-secret',
+    { expiresIn: '7d' }
+  );
 };
