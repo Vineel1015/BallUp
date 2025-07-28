@@ -1,15 +1,14 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
-  username?: string;
+  username: string;
   profilePicture?: string;
   skillLevel?: string;
   preferredPosition?: string;
   bio?: string;
-  isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  isVerified: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Location {
@@ -31,24 +30,17 @@ export interface Location {
 export interface Game {
   id: string;
   locationId: string;
-  title: string;
-  description?: string;
-  dateTime: string;
+  creatorId: string;
+  scheduledTime: string;
+  duration: number;
   maxPlayers: number;
   currentPlayers: number;
-  skillLevel: string;
+  skillLevelRequired?: string;
+  description?: string;
   status: 'scheduled' | 'active' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;
   location?: Location;
-  organizer?: User;
-  players: User[];
-  
-  // Legacy fields for backward compatibility
-  creatorId?: string;
-  scheduledTime?: string;
-  duration?: number;
-  skillLevelRequired?: string;
   creator?: User;
   participants?: GameParticipant[];
 }

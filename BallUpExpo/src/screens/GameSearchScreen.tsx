@@ -9,20 +9,19 @@ import {
   FlatList,
 } from 'react-native';
 import {Game} from '../types';
-import GameMapView from '../components/MapView';
 
 const mockGames: Game[] = [
   {
     id: '1',
     locationId: '1',
-    title: 'Pickup Game at Central Park',
-    dateTime: '2024-07-29T18:00:00Z',
+    creatorId: '1',
+    scheduledTime: '2024-07-29T18:00:00Z',
+    duration: 120,
     maxPlayers: 10,
     currentPlayers: 6,
-    skillLevel: 'intermediate',
+    skillLevelRequired: 'intermediate',
     description: 'Casual pickup game, all skill levels welcome!',
     status: 'scheduled',
-    players: [],
     createdAt: '2024-07-28T12:00:00Z',
     updatedAt: '2024-07-28T12:00:00Z',
     location: {
@@ -44,14 +43,14 @@ const mockGames: Game[] = [
   {
     id: '2',
     locationId: '2',
-    title: 'Beginner Basketball Game',
-    dateTime: '2024-07-30T19:30:00Z',
+    creatorId: '2',
+    scheduledTime: '2024-07-30T19:30:00Z',
+    duration: 90,
     maxPlayers: 8,
     currentPlayers: 3,
-    skillLevel: 'beginner',
+    skillLevelRequired: 'beginner',
     description: 'Beginner-friendly game, come learn!',
     status: 'scheduled',
-    players: [],
     createdAt: '2024-07-28T14:00:00Z',
     updatedAt: '2024-07-28T14:00:00Z',
     location: {
@@ -75,7 +74,6 @@ const mockGames: Game[] = [
 const GameSearchScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [games] = useState(mockGames);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   const filteredGames = games.filter(
     game =>
@@ -98,7 +96,7 @@ const GameSearchScreen: React.FC = () => {
     <TouchableOpacity style={styles.gameCard}>
       <View style={styles.gameHeader}>
         <Text style={styles.locationName}>{item.location?.name}</Text>
-        <Text style={styles.gameTime}>{formatDate(item.dateTime)}</Text>
+        <Text style={styles.gameTime}>{formatDate(item.scheduledTime)}</Text>
       </View>
       
       <Text style={styles.gameDescription}>{item.description}</Text>
@@ -107,8 +105,11 @@ const GameSearchScreen: React.FC = () => {
         <Text style={styles.detailText}>
           Players: {item.currentPlayers}/{item.maxPlayers}
         </Text>
+        <Text style={styles.detailText}>
+          Duration: {item.duration} min
+        </Text>
         <Text style={styles.skillLevel}>
-          Skill: {item.skillLevel}
+          Skill: {item.skillLevelRequired}
         </Text>
       </View>
       
@@ -127,37 +128,15 @@ const GameSearchScreen: React.FC = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
-        <View style={styles.viewToggle}>
-          <TouchableOpacity
-            style={[styles.toggleButton, viewMode === 'list' && styles.activeToggle]}
-            onPress={() => setViewMode('list')}
-          >
-            <Text style={[styles.toggleText, viewMode === 'list' && styles.activeToggleText]}>
-              List
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggleButton, viewMode === 'map' && styles.activeToggle]}
-            onPress={() => setViewMode('map')}
-          >
-            <Text style={[styles.toggleText, viewMode === 'map' && styles.activeToggleText]}>
-              Map
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
-      {viewMode === 'list' ? (
-        <FlatList
-          data={filteredGames}
-          renderItem={renderGame}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.gamesList}
-          showsVerticalScrollIndicator={false}
-        />
-      ) : (
-        <GameMapView />
-      )}
+      <FlatList
+        data={filteredGames}
+        renderItem={renderGame}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.gamesList}
+        showsVerticalScrollIndicator={false}
+      />
     </SafeAreaView>
   );
 };
@@ -245,31 +224,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  viewToggle: {
-    flexDirection: 'row',
-    marginTop: 12,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 8,
-    padding: 2,
-  },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  activeToggle: {
-    backgroundColor: '#FF6B35',
-  },
-  toggleText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-  },
-  activeToggleText: {
-    color: 'white',
   },
 });
 

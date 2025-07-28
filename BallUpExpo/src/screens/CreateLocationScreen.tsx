@@ -9,21 +9,15 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-  Modal,
 } from 'react-native';
-import LocationPickerMap from '../components/LocationPickerMap';
-import { Coordinates } from '../services/locationService';
-import { apiService } from '../services/api';
 
 const CreateLocationScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [description, setDescription] = useState('');
   const [amenities, setAmenities] = useState<string[]>([]);
-  const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
-  const [showMapModal, setShowMapModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<{name?: string; address?: string; location?: string}>({});
+  const [errors, setErrors] = useState<{name?: string; address?: string}>({});
 
   const availableAmenities = [
     'Lighting',
@@ -45,7 +39,7 @@ const CreateLocationScreen: React.FC = () => {
   };
 
   const validateInputs = () => {
-    const newErrors: {name?: string; address?: string; location?: string} = {};
+    const newErrors: {name?: string; address?: string} = {};
     
     if (!name.trim()) {
       newErrors.name = 'Court name is required';
@@ -55,23 +49,8 @@ const CreateLocationScreen: React.FC = () => {
       newErrors.address = 'Address is required';
     }
     
-    if (!coordinates) {
-      newErrors.location = 'Please select a location on the map';
-    }
-    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleLocationSelect = (location: {coordinates: Coordinates; address: string}) => {
-    setCoordinates(location.coordinates);
-    if (!address.trim()) {
-      setAddress(location.address);
-    }
-    setShowMapModal(false);
-    if (errors.location) {
-      setErrors({...errors, location: undefined});
-    }
   };
 
   const handleSubmit = async () => {
@@ -83,14 +62,8 @@ const CreateLocationScreen: React.FC = () => {
     setErrors({});
 
     try {
-      await apiService.createLocation({
-        name: name.trim(),
-        address: address.trim(),
-        latitude: coordinates!.latitude,
-        longitude: coordinates!.longitude,
-        description: description.trim() || undefined,
-        amenities,
-      });
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       Alert.alert(
         'Success',
@@ -103,9 +76,7 @@ const CreateLocationScreen: React.FC = () => {
       setAddress('');
       setDescription('');
       setAmenities([]);
-      setCoordinates(null);
     } catch (error) {
-      console.error('Error creating location:', error);
       Alert.alert('Error', 'Failed to add location. Please try again.');
     } finally {
       setIsLoading(false);
@@ -150,23 +121,6 @@ const CreateLocationScreen: React.FC = () => {
               editable={!isLoading}
             />
             {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Location on Map *</Text>
-            <TouchableOpacity
-              style={[styles.mapButton, errors.location && styles.inputError]}
-              onPress={() => setShowMapModal(true)}
-              disabled={isLoading}
-            >
-              <Text style={styles.mapButtonText}>
-                {coordinates ? 
-                  `📍 Selected (${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)})` : 
-                  '📍 Tap to select location on map'
-                }
-              </Text>
-            </TouchableOpacity>
-            {errors.location && <Text style={styles.errorText}>{errors.location}</Text>}
           </View>
 
           <View style={styles.inputGroup}>
@@ -220,30 +174,6 @@ const CreateLocationScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <Modal
-        visible={showMapModal}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
-        <SafeAreaView style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <TouchableOpacity
-              style={styles.modalCloseButton}
-              onPress={() => setShowMapModal(false)}
-            >
-              <Text style={styles.modalCloseText}>Cancel</Text>
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select Court Location</Text>
-            <View style={styles.modalPlaceholder} />
-          </View>
-          
-          <LocationPickerMap
-            onLocationSelect={handleLocationSelect}
-            initialLocation={coordinates || undefined}
-          />
-        </SafeAreaView>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -349,50 +279,6 @@ const styles = StyleSheet.create({
   },
   loadingIndicator: {
     marginRight: 8,
-  },
-  mapButton: {
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    alignItems: 'center',
-  },
-  mapButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  modalContainer: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: 'white',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  modalCloseButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  modalCloseText: {
-    fontSize: 16,
-    color: '#FF6B35',
-    fontWeight: '600',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  modalPlaceholder: {
-    width: 60,
   },
 });
 
