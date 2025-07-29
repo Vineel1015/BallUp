@@ -88,6 +88,7 @@ const CreateGameScreen: React.FC<Props> = ({navigation}) => {
               value={dateTime}
               onChangeText={setDateTime}
               placeholder="e.g., Mon Jul 29, 6:00 PM"
+              placeholderTextColor="#CCCCCC"
             />
           </View>
 
@@ -127,6 +128,7 @@ const CreateGameScreen: React.FC<Props> = ({navigation}) => {
               value={description}
               onChangeText={setDescription}
               placeholder="Describe your game, what to expect, etc."
+              placeholderTextColor="#CCCCCC"
               multiline
               numberOfLines={4}
             />
@@ -144,10 +146,14 @@ const CreateGameScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 24,
+    width: '100%',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',
@@ -162,11 +168,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#CCCCCC',
     textAlign: 'center',
   },
   form: {
     gap: 16,
+    width: '90%',
   },
   inputGroup: {
     marginBottom: 16,
@@ -174,26 +181,27 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
     minHeight: 48,
     justifyContent: 'center',
+    color: '#FFFFFF',
   },
   inputText: {
     fontSize: 16,
-    color: '#333',
+    color: '#FFFFFF',
   },
   placeholder: {
-    color: '#999',
+    color: '#CCCCCC',
   },
   textArea: {
     height: 100,
@@ -205,9 +213,11 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 8,
     marginTop: 16,
+    width: '90%',
+    alignSelf: 'center',
   },
   createButtonText: {
-    color: 'white',
+    color: '#000000',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',

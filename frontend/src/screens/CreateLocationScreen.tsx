@@ -126,6 +126,7 @@ const CreateLocationScreen: React.FC = () => {
             <TextInput
               style={[styles.input, errors.name && styles.inputError]}
               placeholder="e.g., Central Park Basketball Court"
+              placeholderTextColor="#CCCCCC"
               value={name}
               onChangeText={(text) => {
                 setName(text);
@@ -141,6 +142,7 @@ const CreateLocationScreen: React.FC = () => {
             <TextInput
               style={[styles.input, errors.address && styles.inputError]}
               placeholder="Enter the court address"
+              placeholderTextColor="#CCCCCC"
               value={address}
               onChangeText={(text) => {
                 setAddress(text);
@@ -174,6 +176,7 @@ const CreateLocationScreen: React.FC = () => {
             <TextInput
               style={[styles.input, styles.textArea]}
               placeholder="Describe the court (condition, features, etc.)"
+              placeholderTextColor="#CCCCCC"
               value={description}
               onChangeText={setDescription}
               multiline
@@ -251,10 +254,14 @@ const CreateLocationScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 24,
+    width: '100%',
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
@@ -266,11 +273,12 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#666',
+    color: '#CCCCCC',
     marginBottom: 32,
   },
   form: {
     gap: 24,
+    width: '90%',
   },
   inputGroup: {
     gap: 8,
@@ -278,16 +286,17 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFFFFF',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
+    color: '#FFFFFF',
   },
   textArea: {
     height: 100,
@@ -297,14 +306,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+    justifyContent: 'center',
   },
   amenityChip: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
   },
   amenityChipSelected: {
     backgroundColor: '#FF6B35',
@@ -312,10 +322,10 @@ const styles = StyleSheet.create({
   },
   amenityText: {
     fontSize: 14,
-    color: '#666',
+    color: '#CCCCCC',
   },
   amenityTextSelected: {
-    color: 'white',
+    color: '#000000',
     fontWeight: '600',
   },
   submitButton: {
@@ -323,19 +333,21 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 8,
     marginTop: 16,
+    width: '90%',
+    alignSelf: 'center',
   },
   submitButtonText: {
-    color: 'white',
+    color: '#000000',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
   },
   inputError: {
-    borderColor: '#ff4444',
+    borderColor: '#cc3333',
     borderWidth: 2,
   },
   errorText: {
-    color: '#ff4444',
+    color: '#cc3333',
     fontSize: 14,
     marginTop: 4,
   },
@@ -351,21 +363,21 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   mapButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
     alignItems: 'center',
   },
   mapButtonText: {
     fontSize: 16,
-    color: '#333',
+    color: '#FFFFFF',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -373,9 +385,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#FF6B35',
   },
   modalCloseButton: {
     paddingVertical: 8,
@@ -389,7 +401,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
   },
   modalPlaceholder: {
     width: 60,

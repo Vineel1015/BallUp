@@ -133,11 +133,12 @@ const LoginScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
   },
   content: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 24,
   },
   title: {
@@ -151,25 +152,33 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     marginBottom: 48,
-    color: '#666',
+    color: '#FFFFFF',
+    opacity: 0.9,
   },
   form: {
     gap: 16,
+    width: '100%',
+    alignItems: 'center',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
+    color: '#FFFFFF',
+    width: '90%',
   },
   loginButton: {
     backgroundColor: '#FF6B35',
     paddingVertical: 16,
     borderRadius: 8,
     marginTop: 8,
+    width: '90%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   loginButtonText: {
     color: 'white',
@@ -182,6 +191,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: '#FF6B35',
+    width: '90%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'transparent',
   },
   registerButtonText: {
     color: '#FF6B35',
@@ -192,6 +205,7 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: '#ff4444',
     borderWidth: 2,
+    backgroundColor: '#2A1A1A',
   },
   errorText: {
     color: '#ff4444',

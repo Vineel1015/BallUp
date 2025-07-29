@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RutgersBallUp Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-black: #000000;
+            --dark-gray: #1a1a1a;
+            --medium-gray: #333333;
+            --light-gray: #666666;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --error-color: #f44336;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--primary-black);
+            color: var(--white);
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--dark-gray);
+            border-right: 1px solid var(--glass-border);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary-orange);
+            text-decoration: none;
+        }
+
+        .sidebar-subtitle {
+            font-size: 14px;
+            color: var(--light-gray);
+            margin-top: 5px;
+        }
+
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--glass-bg);
+            color: var(--primary-orange);
+        }
+
+        .nav-item.active {
+            background: var(--primary-orange);
+            color: var(--white);
+        }
+
+        .nav-item-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: var(--light-gray);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-orange);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--light-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Content Sections */
+        .content-section {
+            display: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .data-table th {
+            background: rgba(255, 107, 53, 0.1);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .data-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-orange);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #ff8a5b;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+            color: var(--white);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-approved {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error-color);
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(158, 158, 158, 0.2);
+            color: #9e9e9e;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-input, .filter-select {
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 0.9rem;
+        }
+
+        .filter-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Login Form */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: var(--primary-black);
+        }
+
+        .login-form {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 50px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: var(--light-gray);
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--white);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-orange);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--primary-orange);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #ff8a5b;
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: var(--error-color);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Loading states */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--light-gray);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="login-container">
+        <div class="login-form">
+            <h1 class="login-title">🏀 RutgersBallUp</h1>
+            <p class="login-subtitle">Admin Dashboard</p>
+            
+            <div id="login-error" class="error-message" style="display: none;"></div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="admin-email" required 
+                           placeholder="Enter admin email">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="admin-password" required 
+                           placeholder="Enter password">
+                </div>
+                
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="admin-dashboard" class="admin-container" style="display: none;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">🏀 RutgersBallUp</div>
+                <div class="sidebar-subtitle">Admin Dashboard</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="dashboard">
+                    <span class="nav-item-icon">📊</span>
+                    Dashboard
+                </button>
+                <button class="nav-item" data-section="users">
+                    <span class="nav-item-icon">👥</span>
+                    Users
+                </button>
+                <button class="nav-item" data-section="locations">
+                    <span class="nav-item-icon">📍</span>
+                    Locations
+                </button>
+                <button class="nav-item" data-section="games">
+                    <span class="nav-item-icon">🏀</span>
+                    Games
+                </button>
+                <button class="nav-item" data-section="logs">
+                    <span class="nav-item-icon">📋</span>
+                    Activity Logs
+                </button>
+                <button class="nav-item" onclick="logout()">
+                    <span class="nav-item-icon">🚪</span>
+                    Logout
+                </button>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section active">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Overview of platform activity</p>
+                </div>
+                
+                <div class="stats-grid" id="stats-grid">
+                    <!-- Stats cards will be populated by JavaScript -->
+                </div>
+                
+                <div class="section-title">Recent Activity</div>
+                <div id="recent-activity">
+                    <!-- Recent activity will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">User Management</h1>
+                    <p class="page-subtitle">Manage registered users</p>
+                </div>
+                
+                <div class="filters">
+                    <input type="text" class="filter-input" id="user-search" placeholder="Search users...">
+                    <select class="filter-select" id="user-role-filter">
+                        <option value="">All Roles</option>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super Admin</option>
+                    </select>
+                    <select class="filter-select" id="user-status-filter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadUsers()">Filter</button>
+                </div>
+                
+                <div id="users-table">
+                    <!-- Users table will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Locations Section -->
+            <div id="locations-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Location Management</h1>
+                    <p class="page-subtitle">Approve and manage basketball courts</p>
+                </div>
+                
+                <div class="filters">
+                    <input type="text" class="filter-input" id="location-search" placeholder="Search locations...">
+                    <select class="filter-select" id="location-status-filter">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending Approval</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadLocations()">Filter</button>
+                </div>
+                
+                <div id="locations-table">
+                    <!-- Locations table will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Games Section -->
+            <div id="games-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Game Management</h1>
+                    <p class="page-subtitle">Monitor scheduled games</p>
+                </div>
+                
+                <div class="filters">
+                    <select class="filter-select" id="game-status-filter">
+                        <option value="all">All Status</option>
+                        <option value="scheduled">Scheduled</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadGames()">Filter</button>
+                </div>
+                
+                <div id="games-table">
+                    <!-- Games table will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Logs Section -->
+            <div id="logs-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Activity Logs</h1>
+                    <p class="page-subtitle">Track admin actions and system events</p>
+                </div>
+                
+                <div class="filters">
+                    <input type="text" class="filter-input" id="log-action-filter" placeholder="Filter by action...">
+                    <button class="btn btn-primary" onclick="loadLogs()">Filter</button>
+                </div>
+                
+                <div id="logs-table">
+                    <!-- Logs table will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://localhost:3000/api';
+        let authToken = localStorage.getItem('admin_token');
+        
+        // Check authentication on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (authToken) {
+                showDashboard();
+                loadDashboardData();
+            }
+        });
+
+        // Login functionality
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Check if user has admin role
+                    if (data.user.role === 'admin' || data.user.role === 'super_admin') {
+                        authToken = data.token;
+                        localStorage.setItem('admin_token', authToken);
+                        showDashboard();
+                        loadDashboardData();
+                    } else {
+                        showError('Admin access required');
+                    }
+                } else {
+                    showError(data.error || 'Login failed');
+                }
+            } catch (error) {
+                showError('Network error. Please try again.');
+            }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'flex';
+        }
+
+        function logout() {
+            localStorage.removeItem('admin_token');
+            authToken = null;
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('admin-dashboard').style.display = 'none';
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-item[data-section]').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const section = e.target.closest('.nav-item').dataset.section;
+                switchSection(section);
+            });
+        });
+
+        function switchSection(sectionName) {
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+            
+            // Show/hide sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${sectionName}-section`).classList.add('active');
+            
+            // Load section data
+            switch(sectionName) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'locations':
+                    loadLocations();
+                    break;
+                case 'games':
+                    loadGames();
+                    break;
+                case 'logs':
+                    loadLogs();
+                    break;
+            }
+        }
+
+        // API helper function
+        async function apiRequest(endpoint, options = {}) {
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                    ...options.headers
+                }
+            });
+            
+            if (response.status === 401) {
+                logout();
+                return null;
+            }
+            
+            return response.json();
+        }
+
+        // Dashboard data loading
+        async function loadDashboardData() {
+            try {
+                const data = await apiRequest('/admin/dashboard');
+                if (data) {
+                    renderStats(data.stats);
+                    renderRecentActivity(data.recentActivity);
+                }
+            } catch (error) {
+                console.error('Failed to load dashboard data:', error);
+            }
+        }
+
+        function renderStats(stats) {
+            const statsGrid = document.getElementById('stats-grid');
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-value">${stats.totalUsers}</div>
+                    </div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">📍</div>
+                        <div class="stat-value">${stats.totalLocations}</div>
+                    </div>
+                    <div class="stat-label">Basketball Courts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🏀</div>
+                        <div class="stat-value">${stats.totalGames}</div>
+                    </div>
+                    <div class="stat-label">Total Games</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-value">${stats.pendingLocations}</div>
+                    </div>
+                    <div class="stat-label">Pending Approvals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value">${stats.activeUsers}</div>
+                    </div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-value">${stats.todayGames}</div>
+                    </div>
+                    <div class="stat-label">Today's Games</div>
+                </div>
+            `;
+        }
+
+        function renderRecentActivity(activities) {
+            const activityDiv = document.getElementById('recent-activity');
+            if (activities.length === 0) {
+                activityDiv.innerHTML = '<p class="loading">No recent activity</p>';
+                return;
+            }
+            
+            const activityList = activities.map(activity => `
+                <div style="padding: 15px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${activity.admin.username}</strong> ${activity.action.replace(/_/g, ' ')}
+                        <span style="color: var(--light-gray);">(${activity.targetType}: ${activity.targetId})</span>
+                    </div>
+                    <div style="color: var(--light-gray); font-size: 0.9rem;">
+                        ${new Date(activity.createdAt).toLocaleString()}
+                    </div>
+                </div>
+            `).join('');
+            
+            activityDiv.innerHTML = `<div style="background: var(--glass-bg); border-radius: 10px; border: 1px solid var(--glass-border);">${activityList}</div>`;
+        }
+
+        // Users management
+        async function loadUsers() {
+            const search = document.getElementById('user-search').value;
+            const role = document.getElementById('user-role-filter').value;
+            const status = document.getElementById('user-status-filter').value;
+            
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (role) params.append('role', role);
+            if (status) params.append('status', status);
+            
+            try {
+                const data = await apiRequest(`/admin/users?${params.toString()}`);
+                if (data) {
+                    renderUsersTable(data.users);
+                }
+            } catch (error) {
+                console.error('Failed to load users:', error);
+            }
+        }
+
+        function renderUsersTable(users) {
+            const tableDiv = document.getElementById('users-table');
+            
+            if (users.length === 0) {
+                tableDiv.innerHTML = '<p class="loading">No users found</p>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Games Created</th>
+                            <th>Rating</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(user => `
+                            <tr>
+                                <td>${user.username}</td>
+                                <td>${user.email}</td>
+                                <td><span class="status-badge">${user.role}</span></td>
+                                <td><span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">${user.isActive ? 'Active' : 'Inactive'}</span></td>
+                                <td>${user.gamesCreated}</td>
+                                <td>${user.rating.toFixed(1)}</td>
+                                <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                                <td>
+                                    <button class="btn btn-small btn-primary" onclick="editUser('${user.id}')">Edit</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableDiv.innerHTML = tableHTML;
+        }
+
+        // Locations management
+        async function loadLocations() {
+            const search = document.getElementById('location-search').value;
+            const status = document.getElementById('location-status-filter').value;
+            
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (status) params.append('status', status);
+            
+            try {
+                const data = await apiRequest(`/admin/locations?${params.toString()}`);
+                if (data) {
+                    renderLocationsTable(data.locations);
+                }
+            } catch (error) {
+                console.error('Failed to load locations:', error);
+            }
+        }
+
+        function renderLocationsTable(locations) {
+            const tableDiv = document.getElementById('locations-table');
+            
+            if (locations.length === 0) {
+                tableDiv.innerHTML = '<p class="loading">No locations found</p>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Creator</th>
+                            <th>Status</th>
+                            <th>Games</th>
+                            <th>Rating</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${locations.map(location => `
+                            <tr>
+                                <td>${location.name}</td>
+                                <td>${location.address}</td>
+                                <td>${location.creator.username}</td>
+                                <td>
+                                    <span class="status-badge ${location.isApproved ? 'status-approved' : (location.isActive ? 'status-pending' : 'status-rejected')}">
+                                        ${location.isApproved ? 'Approved' : (location.isActive ? 'Pending' : 'Rejected')}
+                                    </span>
+                                </td>
+                                <td>${location._count.games}</td>
+                                <td>${location.rating.toFixed(1)}</td>
+                                <td>${new Date(location.createdAt).toLocaleDateString()}</td>
+                                <td>
+                                    ${!location.isApproved && location.isActive ? `
+                                        <button class="btn btn-small btn-success" onclick="approveLocation('${location.id}')">Approve</button>
+                                        <button class="btn btn-small btn-danger" onclick="rejectLocation('${location.id}')">Reject</button>
+                                    ` : ''}
+                                    <button class="btn btn-small btn-danger" onclick="deleteLocation('${location.id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableDiv.innerHTML = tableHTML;
+        }
+
+        // Location actions
+        async function approveLocation(locationId) {
+            try {
+                await apiRequest(`/admin/locations/${locationId}/approval`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ approved: true })
+                });
+                loadLocations(); // Reload the table
+            } catch (error) {
+                console.error('Failed to approve location:', error);
+            }
+        }
+
+        async function rejectLocation(locationId) {
+            const reason = prompt('Reason for rejection (optional):');
+            try {
+                await apiRequest(`/admin/locations/${locationId}/approval`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ approved: false, reason })
+                });
+                loadLocations(); // Reload the table
+            } catch (error) {
+                console.error('Failed to reject location:', error);
+            }
+        }
+
+        async function deleteLocation(locationId) {
+            if (!confirm('Are you sure you want to delete this location?')) return;
+            
+            const reason = prompt('Reason for deletion (optional):');
+            try {
+                await apiRequest(`/admin/locations/${locationId}`, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ reason })
+                });
+                loadLocations(); // Reload the table
+            } catch (error) {
+                console.error('Failed to delete location:', error);
+                alert('Failed to delete location. It may have active games.');
+            }
+        }
+
+        // Games management
+        async function loadGames() {
+            const status = document.getElementById('game-status-filter').value;
+            
+            const params = new URLSearchParams();
+            if (status) params.append('status', status);
+            
+            try {
+                const data = await apiRequest(`/admin/games?${params.toString()}`);
+                if (data) {
+                    renderGamesTable(data.games);
+                }
+            } catch (error) {
+                console.error('Failed to load games:', error);
+            }
+        }
+
+        function renderGamesTable(games) {
+            const tableDiv = document.getElementById('games-table');
+            
+            if (games.length === 0) {
+                tableDiv.innerHTML = '<p class="loading">No games found</p>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Location</th>
+                            <th>Creator</th>
+                            <th>Participants</th>
+                            <th>Status</th>
+                            <th>Scheduled</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${games.map(game => `
+                            <tr>
+                                <td>${game.title}</td>
+                                <td>${game.location.name}</td>
+                                <td>${game.creator.username}</td>
+                                <td>${game._count.participants}/${game.maxPlayers}</td>
+                                <td><span class="status-badge">${game.status}</span></td>
+                                <td>${new Date(game.scheduledAt).toLocaleString()}</td>
+                                <td>${new Date(game.createdAt).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableDiv.innerHTML = tableHTML;
+        }
+
+        // Logs management
+        async function loadLogs() {
+            const action = document.getElementById('log-action-filter').value;
+            
+            const params = new URLSearchParams();
+            if (action) params.append('action', action);
+            
+            try {
+                const data = await apiRequest(`/admin/logs?${params.toString()}`);
+                if (data) {
+                    renderLogsTable(data.logs);
+                }
+            } catch (error) {
+                console.error('Failed to load logs:', error);
+            }
+        }
+
+        function renderLogsTable(logs) {
+            const tableDiv = document.getElementById('logs-table');
+            
+            if (logs.length === 0) {
+                tableDiv.innerHTML = '<p class="loading">No logs found</p>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Admin</th>
+                            <th>Action</th>
+                            <th>Target</th>
+                            <th>Details</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logs.map(log => `
+                            <tr>
+                                <td>${log.admin.username}</td>
+                                <td>${log.action.replace(/_/g, ' ')}</td>
+                                <td>${log.targetType}: ${log.targetId}</td>
+                                <td>${log.details ? JSON.stringify(log.details, null, 2) : '-'}</td>
+                                <td>${new Date(log.createdAt).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableDiv.innerHTML = tableHTML;
+        }
+
+        // User editing placeholder
+        function editUser(userId) {
+            // This would open a modal or navigate to an edit page
+            alert(`Edit user functionality for user ${userId} would be implemented here`);
+        }
+    </script>
+</body>
+</html>

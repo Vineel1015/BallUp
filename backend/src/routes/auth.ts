@@ -2,6 +2,13 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
+import { 
+  validateRegister, 
+  validateLogin, 
+  handleValidationErrors 
+} from '../middleware/validation';
+import { logAuth, logError, logSecurity } from '../utils/logger';
+import { authLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
 
@@ -16,17 +23,13 @@ interface LoginRequest {
   password: string;
 }
 
-router.post('/register', async (req: Request<{}, {}, RegisterRequest>, res: Response) => {
+router.post('/register', 
+  authLimiter,
+  validateRegister,
+  handleValidationErrors,
+  async (req: Request<{}, {}, RegisterRequest>, res: Response) => {
   try {
     const { email, username, password } = req.body;
-
-    if (!email || !username || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'Password must be at least 6 characters' });
-    }
 
     // Check if user already exists
     const existingUser = await prisma.user.findFirst({
@@ -39,6 +42,12 @@ router.post('/register', async (req: Request<{}, {}, RegisterRequest>, res: Resp
     });
 
     if (existingUser) {
+      logSecurity('Registration attempt with existing credentials', {
+        attemptedEmail: email,
+        attemptedUsername: username,
+        existingField: existingUser.email === email ? 'email' : 'username',
+        ip: req.ip,
+      });
       return res.status(400).json({ error: 'User with this email or username already exists' });
     }
 
@@ -54,6 +63,8 @@ router.post('/register', async (req: Request<{}, {}, RegisterRequest>, res: Resp
     });
 
     const token = generateToken({ id: user.id, email: user.email });
+
+    logAuth('register', user.id, req.ip);
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -72,33 +83,44 @@ router.post('/register', async (req: Request<{}, {}, RegisterRequest>, res: Resp
       token,
     });
   } catch (error) {
-    console.error('Registration error:', error);
+    logError('Registration error', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-router.post('/login', async (req: Request<{}, {}, LoginRequest>, res: Response) => {
+router.post('/login', 
+  authLimiter,
+  validateLogin,
+  handleValidationErrors,
+  async (req: Request<{}, {}, LoginRequest>, res: Response) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
-    }
 
     const user = await prisma.user.findUnique({
       where: { email }
     });
 
     if (!user) {
+      logSecurity('Login attempt with non-existent email', {
+        attemptedEmail: email,
+        ip: req.ip,
+      });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
+      logSecurity('Login attempt with invalid password', {
+        userId: user.id,
+        email: user.email,
+        ip: req.ip,
+      });
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
     const token = generateToken({ id: user.id, email: user.email });
+
+    logAuth('login', user.id, req.ip);
 
     res.json({
       message: 'Login successful',
@@ -117,7 +139,7 @@ router.post('/login', async (req: Request<{}, {}, LoginRequest>, res: Response) 
       token,
     });
   } catch (error) {
-    console.error('Login error:', error);
+    logError('Login error', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -87,14 +87,19 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
   },
   content: {
     padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
   },
   header: {
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 32,
+    width: '100%',
   },
   welcome: {
     fontSize: 28,
@@ -105,25 +110,30 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#FFFFFF',
     textAlign: 'center',
+    opacity: 0.9,
   },
   actions: {
     gap: 16,
+    width: '100%',
+    alignItems: 'center',
   },
   actionButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#FF6B35',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
+    justifyContent: 'center',
+    width: '90%',
+    shadowColor: '#FF6B35',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
   },
   actionIcon: {
     fontSize: 40,
@@ -132,13 +142,15 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000000',
     marginBottom: 4,
+    textAlign: 'center',
   },
   actionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000',
     textAlign: 'center',
+    opacity: 0.8,
   },
 });
 

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {Game} from '../types';
 import GameMapView from '../components/MapView';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 const mockGames: Game[] = [
   {
@@ -124,6 +125,7 @@ const GameSearchScreen: React.FC = () => {
         <TextInput
           style={styles.searchInput}
           placeholder="Search games by location or description..."
+          placeholderTextColor="#CCCCCC"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -156,7 +158,14 @@ const GameSearchScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         />
       ) : (
-        <GameMapView />
+        <ErrorBoundary fallback={
+          <View style={styles.mapErrorContainer}>
+            <Text style={styles.mapErrorText}>Map failed to load</Text>
+            <Text style={styles.mapErrorSubtext}>Please try switching to list view</Text>
+          </View>
+        }>
+          <GameMapView />
+        </ErrorBoundary>
       )}
     </SafeAreaView>
   );
@@ -165,27 +174,36 @@ const GameSearchScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   searchContainer: {
     padding: 16,
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#FF6B35',
+    width: '100%',
   },
   searchInput: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+    color: '#FFFFFF',
+    width: '90%',
+    alignSelf: 'center',
   },
   gamesList: {
     padding: 16,
     gap: 16,
+    alignItems: 'center',
   },
   gameCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     shadowColor: '#000',
@@ -196,6 +214,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+    width: '90%',
   },
   gameHeader: {
     flexDirection: 'row',
@@ -206,7 +227,7 @@ const styles = StyleSheet.create({
   locationName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     flex: 1,
   },
   gameTime: {
@@ -216,7 +237,7 @@ const styles = StyleSheet.create({
   },
   gameDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#CCCCCC',
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -227,7 +248,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 12,
-    color: '#888',
+    color: '#CCCCCC',
   },
   skillLevel: {
     fontSize: 12,
@@ -240,18 +261,24 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
+    width: '90%',
+    alignSelf: 'center',
   },
   joinButtonText: {
-    color: 'white',
+    color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
   },
   viewToggle: {
     flexDirection: 'row',
     marginTop: 12,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: '#1A1A1A',
     borderRadius: 8,
     padding: 2,
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+    width: '90%',
+    alignSelf: 'center',
   },
   toggleButton: {
     flex: 1,
@@ -266,10 +293,27 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: '#CCCCCC',
   },
   activeToggleText: {
-    color: 'white',
+    color: '#000000',
+  },
+  mapErrorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1A1A1A',
+  },
+  mapErrorText: {
+    fontSize: 18,
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  mapErrorSubtext: {
+    fontSize: 14,
+    color: '#CCCCCC',
+    textAlign: 'center',
   },
 });
 

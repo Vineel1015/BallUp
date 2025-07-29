@@ -1,5 +1,14 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken } from '../middleware/auth';
+import { 
+  validateCreateGame,
+  validateUpdateGame,
+  validateNearbyGames,
+  validateGameFilters,
+  validateUUIDParam,
+  handleValidationErrors
+} from '../middleware/validation';
+import { modifyLimiter, userGameLimiter } from '../middleware/rateLimiter';
 import { prisma } from '../lib/prisma';
 
 const router = Router();
@@ -24,8 +33,36 @@ interface JoinGameRequest {
   gameId: string;
 }
 
+// Get nearby games
+router.get('/nearby', validateNearbyGames, handleValidationErrors, async (req: Request, res: Response) => {
+  try {
+    const { lat, lng, radius = 10 } = req.query;
+    const latitude = parseFloat(lat as string);
+    const longitude = parseFloat(lng as string);
+    const radiusKm = parseInt(radius as string);
+
+    // Using Haversine formula for distance calculation
+    const games = await prisma.$queryRaw`
+      SELECT g.*, l.*, 
+        (6371 * acos(cos(radians(${latitude})) * cos(radians(l.latitude)) * 
+        cos(radians(l.longitude) - radians(${longitude})) + 
+        sin(radians(${latitude})) * sin(radians(l.latitude)))) AS distance
+      FROM "Game" g
+      JOIN "Location" l ON g."locationId" = l.id
+      WHERE g.status = 'scheduled'
+      HAVING distance <= ${radiusKm}
+      ORDER BY distance ASC
+    `;
+
+    res.json(games);
+  } catch (error) {
+    console.error('Error fetching nearby games:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get all games
-router.get('/', async (req: Request, res: Response) => {
+router.get('/', validateGameFilters, handleValidationErrors, async (req: Request, res: Response) => {
   try {
     const { locationId, status, skillLevel } = req.query;
     
@@ -91,7 +128,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 // Get game by ID
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', validateUUIDParam('id'), handleValidationErrors, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     
@@ -139,7 +176,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 });
 
 // Create new game (requires authentication)
-router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/', userGameLimiter, validateCreateGame, handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { locationId, scheduledTime, duration, maxPlayers, skillLevelRequired, description } = req.body as CreateGameRequest;
 
@@ -214,16 +251,12 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
 });
 
 // Join a game (requires authentication)
-router.post('/join', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/:id/join', userGameLimiter, validateUUIDParam('id'), handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { gameId } = req.body as JoinGameRequest;
+    const { id: gameId } = req.params;
 
     if (!req.user) {
       return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    if (!gameId) {
-      return res.status(400).json({ error: 'gameId is required' });
     }
 
     const game = await prisma.game.findUnique({
@@ -245,7 +278,45 @@ router.post('/join', authenticateToken, async (req: AuthRequest, res: Response) 
       return res.status(400).json({ error: 'Game is full' });
     }
 
-    // Check if user is already a participant
+    // Check if user already has an active game
+    const existingActiveGame = await prisma.game.findFirst({
+      where: {
+        AND: [
+          {
+            participants: {
+              some: {
+                userId: req.user.id,
+                status: 'joined'
+              }
+            }
+          },
+          {
+            status: {
+              in: ['scheduled', 'starting', 'active']
+            }
+          },
+          {
+            scheduledAt: {
+              gte: new Date(Date.now() - 3 * 60 * 60 * 1000)
+            }
+          }
+        ]
+      },
+      select: {
+        id: true,
+        title: true,
+        scheduledAt: true
+      }
+    });
+
+    if (existingActiveGame) {
+      return res.status(400).json({ 
+        error: 'You can only participate in one game at a time',
+        activeGame: existingActiveGame
+      });
+    }
+
+    // Check if user is already a participant in this specific game
     const existingParticipant = await prisma.gameParticipant.findUnique({
       where: {
         gameId_userId: {
@@ -259,23 +330,31 @@ router.post('/join', authenticateToken, async (req: AuthRequest, res: Response) 
       return res.status(400).json({ error: 'You are already participating in this game' });
     }
 
-    // Add user as participant
-    await prisma.gameParticipant.create({
-      data: {
-        gameId,
-        userId: req.user.id,
-        status: 'confirmed'
+    // Add user as participant and update count atomically
+    await prisma.$transaction(async (tx) => {
+      // Double-check availability within transaction
+      const currentParticipants = await tx.gameParticipant.count({
+        where: { gameId }
+      });
+
+      if (currentParticipants >= game.maxPlayers) {
+        throw new Error('Game is full');
       }
-    });
 
-    // Update current players count
-    const participantCount = await prisma.gameParticipant.count({
-      where: { gameId }
-    });
+      // Add user as participant
+      await tx.gameParticipant.create({
+        data: {
+          gameId,
+          userId: req.user.id,
+          status: 'confirmed'
+        }
+      });
 
-    await prisma.game.update({
-      where: { id: gameId },
-      data: { currentPlayers: participantCount }
+      // Update current players count
+      await tx.game.update({
+        where: { id: gameId },
+        data: { currentPlayers: currentParticipants + 1 }
+      });
     });
 
     res.json({ message: 'Successfully joined the game' });
@@ -286,16 +365,12 @@ router.post('/join', authenticateToken, async (req: AuthRequest, res: Response) 
 });
 
 // Leave a game (requires authentication)
-router.post('/leave', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.post('/:id/leave', userGameLimiter, validateUUIDParam('id'), handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { gameId } = req.body as JoinGameRequest;
+    const { id: gameId } = req.params;
 
     if (!req.user) {
       return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    if (!gameId) {
-      return res.status(400).json({ error: 'gameId is required' });
     }
 
     const game = await prisma.game.findUnique({
@@ -320,24 +395,27 @@ router.post('/leave', authenticateToken, async (req: AuthRequest, res: Response)
       return res.status(400).json({ error: 'You are not participating in this game' });
     }
 
-    // Remove participant
-    await prisma.gameParticipant.delete({
-      where: {
-        gameId_userId: {
-          gameId,
-          userId: req.user.id
+    // Remove participant and update count atomically
+    await prisma.$transaction(async (tx) => {
+      // Remove participant
+      await tx.gameParticipant.delete({
+        where: {
+          gameId_userId: {
+            gameId,
+            userId: req.user.id
+          }
         }
-      }
-    });
+      });
 
-    // Update current players count
-    const participantCount = await prisma.gameParticipant.count({
-      where: { gameId }
-    });
+      // Update current players count
+      const participantCount = await tx.gameParticipant.count({
+        where: { gameId }
+      });
 
-    await prisma.game.update({
-      where: { id: gameId },
-      data: { currentPlayers: participantCount }
+      await tx.game.update({
+        where: { id: gameId },
+        data: { currentPlayers: participantCount }
+      });
     });
 
     res.json({ message: 'Successfully left the game' });
@@ -348,7 +426,7 @@ router.post('/leave', authenticateToken, async (req: AuthRequest, res: Response)
 });
 
 // Update game (requires authentication and ownership)
-router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.put('/:id', validateUpdateGame, handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { scheduledTime, duration, maxPlayers, skillLevelRequired, description, status } = req.body;
@@ -422,7 +500,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
 });
 
 // Delete game (requires authentication and ownership)
-router.delete('/:id', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.delete('/:id', validateUUIDParam('id'), handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 

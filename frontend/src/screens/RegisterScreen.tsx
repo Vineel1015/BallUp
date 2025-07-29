@@ -58,6 +58,7 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor="#CCCCCC"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -66,6 +67,7 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
           <TextInput
             style={styles.input}
             placeholder="Username"
+            placeholderTextColor="#CCCCCC"
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
@@ -73,6 +75,7 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor="#CCCCCC"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -80,6 +83,7 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
+            placeholderTextColor="#CCCCCC"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -97,12 +101,16 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 24,
     justifyContent: 'center',
+    alignItems: 'center',
     minHeight: '100%',
+    width: '100%',
   },
   title: {
     fontSize: 32,
@@ -115,28 +123,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginBottom: 32,
-    color: '#666',
+    color: '#CCCCCC',
   },
   form: {
     gap: 16,
+    width: '90%',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
+    color: '#FFFFFF',
   },
   registerButton: {
     backgroundColor: '#FF6B35',
     paddingVertical: 16,
     borderRadius: 8,
     marginTop: 8,
+    width: '90%',
+    alignSelf: 'center',
   },
   registerButtonText: {
-    color: 'white',
+    color: '#000000',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',

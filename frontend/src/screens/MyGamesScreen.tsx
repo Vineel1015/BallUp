@@ -128,10 +128,14 @@ const MyGamesScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 24,
+    width: '100%',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',
@@ -146,7 +150,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#CCCCCC',
     textAlign: 'center',
   },
   emptyState: {
@@ -160,12 +164,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   emptyDescription: {
     fontSize: 16,
-    color: '#666',
+    color: '#CCCCCC',
     textAlign: 'center',
     marginBottom: 24,
   },
@@ -174,17 +178,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
+    width: '90%',
+    alignItems: 'center',
   },
   createButtonText: {
-    color: 'white',
+    color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
   },
   gamesList: {
     gap: 16,
+    width: '100%',
+    alignItems: 'center',
   },
   gameCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     padding: 20,
     borderRadius: 12,
     shadowColor: '#000',
@@ -195,6 +203,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+    width: '90%',
   },
   gameHeader: {
     flexDirection: 'row',
@@ -205,7 +216,7 @@ const styles = StyleSheet.create({
   locationName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     flex: 1,
   },
   gameTime: {
@@ -215,7 +226,7 @@ const styles = StyleSheet.create({
   },
   gameDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#CCCCCC',
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -226,7 +237,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 12,
-    color: '#888',
+    color: '#CCCCCC',
   },
   roleText: {
     color: '#FF6B35',
@@ -234,12 +245,14 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
   },
   cancelButton: {
-    backgroundColor: '#ff4444',
+    backgroundColor: '#cc3333',
     paddingVertical: 12,
     borderRadius: 8,
+    width: '90%',
+    alignSelf: 'center',
   },
   cancelButtonText: {
-    color: 'white',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -249,6 +262,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: '#FF6B35',
+    width: '90%',
+    alignSelf: 'center',
   },
   leaveButtonText: {
     color: '#FF6B35',

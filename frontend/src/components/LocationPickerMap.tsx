@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import {
@@ -15,6 +16,7 @@ import {
 } from '../services/locationService';
 import { searchLocation, reverseGeocode } from '../services/geocodingService';
 import { MAPS_CONFIG } from '../config/maps';
+import { debounce } from '../utils/debounce';
 
 interface LocationPickerMapProps {
   onLocationSelect: (location: {
@@ -24,7 +26,7 @@ interface LocationPickerMapProps {
   initialLocation?: Coordinates;
 }
 
-const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
+const LocationPickerMap: React.FC<LocationPickerMapProps> = React.memo(({
   onLocationSelect,
   initialLocation,
 }) => {
@@ -41,6 +43,7 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
   );
   const [searchQuery, setSearchQuery] = useState('');
   const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null);
+  const [isGeocodingLoading, setIsGeocodingLoading] = useState(false);
   const mapRef = useRef<MapView>(null);
 
   useEffect(() => {
@@ -66,14 +69,47 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
     }
   };
 
+  // Debounced reverse geocode function to prevent excessive API calls
+  const debouncedReverseGeocode = useCallback(
+    debounce(async (coordinates: Coordinates) => {
+      try {
+        setIsGeocodingLoading(true);
+        const address = await reverseGeocode(coordinates.latitude, coordinates.longitude);
+        
+        onLocationSelect({
+          coordinates,
+          address,
+        });
+      } catch (error) {
+        console.error('Error reverse geocoding:', error);
+        onLocationSelect({
+          coordinates,
+          address: `${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`,
+        });
+      } finally {
+        setIsGeocodingLoading(false);
+      }
+    }, 500), // 500ms delay to prevent excessive calls
+    [onLocationSelect]
+  );
+
   const handleMapPress = (event: any) => {
     const { coordinate } = event.nativeEvent;
     setSelectedLocation(coordinate);
-    handleReverseGeocode(coordinate);
+    
+    // Immediately show the selected location, but debounce the reverse geocoding
+    onLocationSelect({
+      coordinates: coordinate,
+      address: `${coordinate.latitude.toFixed(4)}, ${coordinate.longitude.toFixed(4)}`,
+    });
+    
+    // This will be debounced
+    debouncedReverseGeocode(coordinate);
   };
 
   const handleReverseGeocode = async (coordinates: Coordinates) => {
     try {
+      setIsGeocodingLoading(true);
       const address = await reverseGeocode(coordinates.latitude, coordinates.longitude);
       
       onLocationSelect({
@@ -86,6 +122,8 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
         coordinates,
         address: `${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`,
       });
+    } finally {
+      setIsGeocodingLoading(false);
     }
   };
 
@@ -108,10 +146,14 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
         };
         
         setRegion(newRegion);
-        setSelectedLocation({
+        const newLocation = {
           latitude: firstResult.latitude,
           longitude: firstResult.longitude,
-        });
+        };
+        setSelectedLocation(newLocation);
+        
+        // Use the debounced reverse geocoding for consistency
+        debouncedReverseGeocode(newLocation);
         
         mapRef.current?.animateToRegion(newRegion);
       } else {
@@ -187,14 +229,22 @@ const LocationPickerMap: React.FC<LocationPickerMapProps> = ({
         </TouchableOpacity>
         
         {selectedLocation && (
-          <Text style={styles.selectedLocationText}>
-            Selected: {selectedLocation.latitude.toFixed(4)}, {selectedLocation.longitude.toFixed(4)}
-          </Text>
+          <View style={styles.selectedLocationContainer}>
+            <Text style={styles.selectedLocationText}>
+              Selected: {selectedLocation.latitude.toFixed(4)}, {selectedLocation.longitude.toFixed(4)}
+            </Text>
+            {isGeocodingLoading && (
+              <View style={styles.geocodingLoadingContainer}>
+                <ActivityIndicator size="small" color="#FF6B35" />
+                <Text style={styles.geocodingLoadingText}>Getting address...</Text>
+              </View>
+            )}
+          </View>
         )}
       </View>
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

@@ -93,6 +93,7 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
               multiline
               numberOfLines={4}
               placeholder="Tell other players about yourself..."
+              placeholderTextColor="#CCCCCC"
             />
           </View>
 
@@ -112,10 +113,14 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 24,
+    width: '100%',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',
@@ -130,11 +135,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#CCCCCC',
     textAlign: 'center',
   },
   form: {
     gap: 16,
+    width: '90%',
   },
   inputGroup: {
     marginBottom: 16,
@@ -142,23 +148,24 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#FF6B35',
     minHeight: 48,
     justifyContent: 'center',
+    color: '#FFFFFF',
   },
   readOnlyInput: {
-    backgroundColor: '#f8f8f8',
-    color: '#666',
+    backgroundColor: '#333333',
+    color: '#CCCCCC',
   },
   textArea: {
     height: 100,
@@ -167,16 +174,18 @@ const styles = StyleSheet.create({
   },
   inputText: {
     fontSize: 16,
-    color: '#333',
+    color: '#FFFFFF',
   },
   updateButton: {
     backgroundColor: '#FF6B35',
     paddingVertical: 16,
     borderRadius: 8,
     marginTop: 16,
+    width: '90%',
+    alignSelf: 'center',
   },
   updateButtonText: {
-    color: 'white',
+    color: '#000000',
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -187,6 +196,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#FF6B35',
     marginTop: 8,
+    width: '90%',
+    alignSelf: 'center',
   },
   logoutButtonText: {
     color: '#FF6B35',

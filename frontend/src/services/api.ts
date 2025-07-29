@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { CONFIG } from '../config/environment';
+import { tokenStorage } from './tokenStorage';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = CONFIG.API_BASE_URL;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,16 +11,66 @@ const api = axios.create({
   },
 });
 
-let authToken: string | null = null;
+// Request interceptor to add auth token to requests
+api.interceptors.request.use(
+  async (config) => {
+    const token = await tokenStorage.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-export const setAuthToken = (token: string) => {
-  authToken = token;
-  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+// Response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Clear invalid token
+      await tokenStorage.removeToken();
+      // You might want to redirect to login screen here
+      console.warn('Authentication failed. Token cleared.');
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const setAuthToken = async (token: string): Promise<void> => {
+  try {
+    await tokenStorage.setToken(token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } catch (error) {
+    console.error('Failed to set auth token:', error);
+    throw error;
+  }
 };
 
-export const clearAuthToken = () => {
-  authToken = null;
-  delete api.defaults.headers.common['Authorization'];
+export const clearAuthToken = async (): Promise<void> => {
+  try {
+    await tokenStorage.removeToken();
+    delete api.defaults.headers.common['Authorization'];
+  } catch (error) {
+    console.error('Failed to clear auth token:', error);
+    throw error;
+  }
+};
+
+export const initializeAuth = async (): Promise<boolean> => {
+  try {
+    const token = await tokenStorage.getToken();
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Failed to initialize auth:', error);
+    return false;
+  }
 };
 
 export const apiService = {

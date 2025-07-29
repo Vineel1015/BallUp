@@ -28,7 +28,7 @@ interface GameMapViewProps {
   initialRegion?: Region;
 }
 
-const GameMapView: React.FC<GameMapViewProps> = ({
+const GameMapView: React.FC<GameMapViewProps> = React.memo(({
   onGameSelect,
   onLocationSelect,
   showCurrentLocation = true,
@@ -211,7 +211,7 @@ const GameMapView: React.FC<GameMapViewProps> = ({
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

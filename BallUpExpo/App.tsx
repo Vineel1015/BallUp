@@ -246,15 +246,18 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
   },
   screen: {
     flex: 1,
     padding: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
     alignItems: 'center',
     marginBottom: 32,
+    width: '100%',
   },
   welcome: {
     fontSize: 28,
@@ -272,26 +275,31 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#FFFFFF',
     textAlign: 'center',
+    opacity: 0.9,
   },
   actions: {
     flex: 1,
+    width: '100%',
+    alignItems: 'center',
   },
   actionButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#FF6B35',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
-    shadowColor: '#000',
+    width: '90%',
+    shadowColor: '#FF6B35',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
   },
   actionIcon: {
     fontSize: 40,
@@ -300,21 +308,25 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000000',
     marginBottom: 4,
+    textAlign: 'center',
   },
   actionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#000000',
     textAlign: 'center',
+    opacity: 0.8,
   },
   navHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#FF6B35',
     marginBottom: 24,
+    width: '100%',
   },
   backButton: {
     fontSize: 18,
@@ -324,21 +336,27 @@ const styles = StyleSheet.create({
   navTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
+    flex: 1,
+    textAlign: 'center',
   },
   gameCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#1A1A1A',
     padding: 16,
     borderRadius: 12,
     marginBottom: 16,
-    shadowColor: '#000',
+    width: '90%',
+    alignSelf: 'center',
+    borderWidth: 1,
+    borderColor: '#FF6B35',
+    shadowColor: '#FF6B35',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 3,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
   },
   gameHeader: {
     flexDirection: 'row',
@@ -349,7 +367,7 @@ const styles = StyleSheet.create({
   locationName: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     flex: 1,
   },
   gameTime: {
@@ -359,7 +377,7 @@ const styles = StyleSheet.create({
   },
   gameDescription: {
     fontSize: 14,
-    color: '#666',
+    color: '#CCCCCC',
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -370,7 +388,7 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 12,
-    color: '#888',
+    color: '#AAAAAA',
   },
   skillLevel: {
     fontSize: 12,
@@ -403,7 +421,10 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 60,
+    flex: 1,
+    width: '100%',
   },
   emptyIcon: {
     fontSize: 60,
@@ -412,12 +433,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
   emptyDescription: {
     fontSize: 16,
-    color: '#666',
+    color: '#CCCCCC',
     textAlign: 'center',
     marginBottom: 24,
   },
