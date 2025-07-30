@@ -22,10 +22,11 @@ interface AuthRequest extends Request {
 
 interface CreateGameRequest {
   locationId: string;
+  title: string;
   scheduledTime: string;
   duration: number;
   maxPlayers: number;
-  skillLevelRequired?: string;
+  skillLevel?: string;
   description?: string;
 }
 
@@ -77,7 +78,7 @@ router.get('/', validateGameFilters, handleValidationErrors, async (req: Request
     }
     
     if (skillLevel) {
-      where.skillLevelRequired = skillLevel as string;
+      where.skillLevel = skillLevel as string;
     }
 
     const games = await prisma.game.findMany({
@@ -110,14 +111,14 @@ router.get('/', validateGameFilters, handleValidationErrors, async (req: Request
         }
       },
       orderBy: {
-        scheduledTime: 'asc'
+        scheduledAt: 'asc'
       }
     });
 
     // Update currentPlayers count
     const gamesWithCount = games.map(game => ({
       ...game,
-      currentPlayers: game._count.participants
+      currentPlayers: game._count?.participants || 0
     }));
 
     res.json(gamesWithCount);
@@ -178,14 +179,14 @@ router.get('/:id', validateUUIDParam('id'), handleValidationErrors, async (req: 
 // Create new game (requires authentication)
 router.post('/', userGameLimiter, validateCreateGame, handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { locationId, scheduledTime, duration, maxPlayers, skillLevelRequired, description } = req.body as CreateGameRequest;
+    const { locationId, title, scheduledTime, duration, maxPlayers, skillLevel, description } = req.body as CreateGameRequest;
 
     if (!req.user) {
       return res.status(401).json({ error: 'User not authenticated' });
     }
 
-    if (!locationId || !scheduledTime || !duration || !maxPlayers) {
-      return res.status(400).json({ error: 'locationId, scheduledTime, duration, and maxPlayers are required' });
+    if (!locationId || !title || !scheduledTime || !duration || !maxPlayers) {
+      return res.status(400).json({ error: 'locationId, title, scheduledTime, duration, and maxPlayers are required' });
     }
 
     // Verify location exists
@@ -206,11 +207,12 @@ router.post('/', userGameLimiter, validateCreateGame, handleValidationErrors, au
     const game = await prisma.game.create({
       data: {
         locationId,
+        title,
         creatorId: req.user.id,
-        scheduledTime: scheduledDate,
+        scheduledAt: scheduledDate,
         duration,
         maxPlayers,
-        skillLevelRequired,
+        skillLevel,
         description,
       },
       include: {
@@ -285,7 +287,7 @@ router.post('/:id/join', userGameLimiter, validateUUIDParam('id'), handleValidat
           {
             participants: {
               some: {
-                userId: req.user.id,
+                userId: req.user!.id,
                 status: 'joined'
               }
             }
@@ -321,7 +323,7 @@ router.post('/:id/join', userGameLimiter, validateUUIDParam('id'), handleValidat
       where: {
         gameId_userId: {
           gameId,
-          userId: req.user.id
+          userId: req.user!.id
         }
       }
     });
@@ -345,7 +347,7 @@ router.post('/:id/join', userGameLimiter, validateUUIDParam('id'), handleValidat
       await tx.gameParticipant.create({
         data: {
           gameId,
-          userId: req.user.id,
+          userId: req.user!.id,
           status: 'confirmed'
         }
       });
@@ -386,7 +388,7 @@ router.post('/:id/leave', userGameLimiter, validateUUIDParam('id'), handleValida
       where: {
         gameId_userId: {
           gameId,
-          userId: req.user.id
+          userId: req.user!.id
         }
       }
     });
@@ -402,7 +404,7 @@ router.post('/:id/leave', userGameLimiter, validateUUIDParam('id'), handleValida
         where: {
           gameId_userId: {
             gameId,
-            userId: req.user.id
+            userId: req.user!.id
           }
         }
       });
@@ -429,7 +431,7 @@ router.post('/:id/leave', userGameLimiter, validateUUIDParam('id'), handleValida
 router.put('/:id', validateUpdateGame, handleValidationErrors, authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { scheduledTime, duration, maxPlayers, skillLevelRequired, description, status } = req.body;
+    const { title, scheduledTime, duration, maxPlayers, skillLevel, description, status } = req.body;
 
     if (!req.user) {
       return res.status(401).json({ error: 'User not authenticated' });
@@ -443,23 +445,24 @@ router.put('/:id', validateUpdateGame, handleValidationErrors, authenticateToken
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    if (existingGame.creatorId !== req.user.id) {
+    if (existingGame.creatorId !== req.user!.id) {
       return res.status(403).json({ error: 'You can only update your own games' });
     }
 
     const updateData: any = {};
     
+    if (title) updateData.title = title;
     if (scheduledTime) {
       const scheduledDate = new Date(scheduledTime);
       if (scheduledDate <= new Date()) {
         return res.status(400).json({ error: 'Scheduled time must be in the future' });
       }
-      updateData.scheduledTime = scheduledDate;
+      updateData.scheduledAt = scheduledDate;
     }
     
     if (duration) updateData.duration = duration;
     if (maxPlayers) updateData.maxPlayers = maxPlayers;
-    if (skillLevelRequired) updateData.skillLevelRequired = skillLevelRequired;
+    if (skillLevel) updateData.skillLevel = skillLevel;
     if (description !== undefined) updateData.description = description;
     if (status) updateData.status = status;
 
@@ -516,7 +519,7 @@ router.delete('/:id', validateUUIDParam('id'), handleValidationErrors, authentic
       return res.status(404).json({ error: 'Game not found' });
     }
 
-    if (existingGame.creatorId !== req.user.id) {
+    if (existingGame.creatorId !== req.user!.id) {
       return res.status(403).json({ error: 'You can only delete your own games' });
     }
 

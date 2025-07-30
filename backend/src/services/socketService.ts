@@ -77,7 +77,7 @@ export const setupSocketHandlers = (io: Server) => {
           where: { id: gameId },
           include: {
             location: true,
-            players: {
+            participants: {
               include: {
                 user: {
                   select: { id: true, username: true, email: true }
@@ -101,13 +101,13 @@ export const setupSocketHandlers = (io: Server) => {
             id: game.id,
             title: game.title,
             description: game.description,
-            dateTime: game.dateTime,
+            dateTime: game.scheduledAt,
             maxPlayers: game.maxPlayers,
-            currentPlayers: game.players.length,
+            currentPlayers: game.participants.length,
             status: game.status,
             skillLevel: game.skillLevel,
             location: game.location,
-            players: game.players.map(p => ({
+            players: game.participants.map((p: any) => ({
               id: p.user.id,
               username: p.user.username,
               joinedAt: p.joinedAt
@@ -148,7 +148,7 @@ export const setupSocketHandlers = (io: Server) => {
         const { gameId, message } = data;
         
         // Verify user is part of the game
-        const gamePlayer = await prisma.gamePlayer.findFirst({
+        const gameParticipant = await prisma.gameParticipant.findFirst({
           where: {
             gameId,
             userId: socket.userId
@@ -160,7 +160,7 @@ export const setupSocketHandlers = (io: Server) => {
           }
         });
 
-        if (!gamePlayer) {
+        if (!gameParticipant) {
           socket.emit('error', { message: 'You are not part of this game' });
           return;
         }
@@ -168,14 +168,14 @@ export const setupSocketHandlers = (io: Server) => {
         const chatMessage = {
           id: Date.now().toString(),
           userId: socket.userId,
-          username: gamePlayer.user.username,
+          username: gameParticipant.user.username,
           message,
           timestamp: new Date().toISOString()
         };
 
         // Broadcast message to all users in the game room
         io.to(`game:${gameId}`).emit('game-message', chatMessage);
-        console.log(`💬 Message in game ${gameId} from ${gamePlayer.user.username}: ${message}`);
+        console.log(`💬 Message in game ${gameId} from ${gameParticipant.user.username}: ${message}`);
 
       } catch (error) {
         console.error('Error handling game message:', error);
@@ -234,9 +234,9 @@ export const setupSocketHandlers = (io: Server) => {
           id: game.id,
           title: game.title,
           location: game.location,
-          dateTime: game.dateTime,
+          dateTime: game.scheduledAt,
           maxPlayers: game.maxPlayers,
-          currentPlayers: game.players?.length || 0,
+          currentPlayers: game.participants?.length || 0,
           skillLevel: game.skillLevel
         }
       });
@@ -275,11 +275,11 @@ export const setupSocketHandlers = (io: Server) => {
       });
       
       // Also notify all players personally
-      gameData.players?.forEach((player: any) => {
-        io.to(`user:${player.userId}`).emit('game-cancelled-notification', {
+      gameData.participants?.forEach((participant: any) => {
+        io.to(`user:${participant.userId}`).emit('game-cancelled-notification', {
           gameId,
           title: gameData.title,
-          dateTime: gameData.dateTime
+          dateTime: gameData.scheduledAt
         });
       });
       console.log(`🚫 Game ${gameId} cancelled and players notified`);

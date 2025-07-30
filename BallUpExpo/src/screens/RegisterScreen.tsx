@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
+import { apiService, setAuthToken } from '../services/api';
 
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -26,8 +27,9 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!email || !username || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -43,9 +45,23 @@ const RegisterScreen: React.FC<Props> = ({navigation}) => {
       return;
     }
 
-    Alert.alert('Success', 'Account created successfully!', [
-      {text: 'OK', onPress: () => navigation.navigate('Home')},
-    ]);
+    setLoading(true);
+    try {
+      const response = await apiService.register({ email, username, password });
+      
+      // Store the auth token
+      await setAuthToken(response.data.token);
+      
+      Alert.alert('Success', 'Account created successfully!', [
+        {text: 'OK', onPress: () => navigation.navigate('Home')},
+      ]);
+    } catch (error: any) {
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.error || 'Registration failed. Please try again.';
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

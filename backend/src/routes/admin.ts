@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { authenticateToken, requireAdmin } from '../middleware/auth';
 import { body, query, param, validationResult } from 'express-validator';
 import { prisma } from '../lib/prisma';
@@ -82,7 +82,7 @@ router.get('/users', [
   query('search').optional().isString(),
   query('role').optional().isIn(['user', 'admin', 'super_admin']),
   query('status').optional().isIn(['active', 'inactive'])
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -156,7 +156,7 @@ router.patch('/users/:id', [
   body('role').optional().isIn(['user', 'admin', 'super_admin']),
   body('isActive').optional().isBoolean(),
   body('isVerified').optional().isBoolean()
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -212,7 +212,7 @@ router.get('/locations', [
   query('limit').optional().isInt({ min: 1, max: 100 }),
   query('status').optional().isIn(['pending', 'approved', 'rejected', 'all']),
   query('search').optional().isString()
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -293,7 +293,7 @@ router.patch('/locations/:id/approval', [
   param('id').isString(),
   body('approved').isBoolean(),
   body('reason').optional().isString()
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -345,7 +345,7 @@ router.patch('/locations/:id/approval', [
 router.delete('/locations/:id', [
   param('id').isString(),
   body('reason').optional().isString()
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -409,7 +409,7 @@ router.get('/games', [
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 100 }),
   query('status').optional().isIn(['scheduled', 'active', 'completed', 'cancelled', 'all'])
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -476,7 +476,7 @@ router.get('/logs', [
   query('limit').optional().isInt({ min: 1, max: 100 }),
   query('action').optional().isString(),
   query('adminId').optional().isString()
-], async (req, res) => {
+], async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });

@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
+import { apiService, setAuthToken } from '../services/api';
 
 type LoginScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -55,11 +56,17 @@ const LoginScreen: React.FC<Props> = ({navigation}) => {
     setErrors({});
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await apiService.login({ email, password });
+      
+      // Store the auth token
+      await setAuthToken(response.data.token);
+      
+      Alert.alert('Success', 'Login successful!');
       navigation.navigate('Home');
-    } catch (error) {
-      Alert.alert('Error', 'Login failed. Please try again.');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      const errorMessage = error.response?.data?.error || 'Login failed. Please try again.';
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }

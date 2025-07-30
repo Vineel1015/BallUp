@@ -1,8 +1,13 @@
 import axios from 'axios';
-import { CONFIG } from '../config/environment';
+import { Platform } from 'react-native';
 import { tokenStorage } from './tokenStorage';
 
-const API_BASE_URL = CONFIG.API_BASE_URL;
+// API Base URL configuration
+const API_BASE_URL = Platform.select({
+  ios: 'http://localhost:3000/api',
+  android: 'http://10.0.2.2:3000/api', // Android emulator localhost
+  default: 'http://localhost:3000/api',
+}) as string;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

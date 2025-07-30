@@ -1,56 +1,111 @@
 export interface User {
   id: string;
-  name: string;
   email: string;
-  username?: string;
+  username: string;
+  firstName?: string;
+  lastName?: string;
   profilePicture?: string;
-  skillLevel?: string;
+  skillLevel: string;
   preferredPosition?: string;
   bio?: string;
-  isVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  isVerified: boolean;
+  isActive: boolean;
+  role: string;
+  
+  // Location preferences
+  latitude?: number;
+  longitude?: number;
+  locationRadius: number;
+  
+  // Stats
+  gamesPlayed: number;
+  gamesCreated: number;
+  rating: number;
+  totalRatings: number;
+  
+  // Timestamps
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt?: string;
 }
 
 export interface Location {
   id: string;
   name: string;
   address: string;
+  description?: string;
   latitude: number;
   longitude: number;
-  description?: string;
+  
+  // Court details
+  courtType: string;
+  surfaceType: string;
+  hoopCount: number;
   amenities: string[];
   photos: string[];
-  rating?: number;
-  isVerified: boolean;
+  
+  // Status and approval
+  isActive: boolean;
+  isVerified: boolean;  
+  isApproved: boolean;
+  approvedBy?: string;
+  approvedAt?: string;
+  
+  // Ratings and usage
+  rating: number;
+  totalRatings: number;
+  totalGames: number;
+  
+  // Timestamps
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+  
+  // Relations
+  creator?: User;
 }
 
 export interface Game {
   id: string;
-  locationId: string;
   title: string;
   description?: string;
-  dateTime: string;
+  
+  // Game details
+  skillLevel?: string;
   maxPlayers: number;
   currentPlayers: number;
-  skillLevel: string;
-  status: 'scheduled' | 'active' | 'completed' | 'cancelled';
+  gameType: string;
+  duration?: number;
+  
+  // Timing
+  scheduledAt: string; // This maps to backend scheduledAt
+  startedAt?: string;
+  endedAt?: string;
+  
+  // Status
+  status: 'scheduled' | 'starting' | 'active' | 'completed' | 'cancelled';
+  isPrivate: boolean;
+  requiresApproval: boolean;
+  
+  // Relations
+  locationId: string;
+  creatorId: string;
+  
+  // Timestamps
   createdAt: string;
   updatedAt: string;
-  location?: Location;
-  organizer?: User;
-  players: User[];
   
-  // Legacy fields for backward compatibility
-  creatorId?: string;
-  scheduledTime?: string;
-  duration?: number;
-  skillLevelRequired?: string;
+  // Relations
+  location?: Location;
   creator?: User;
   participants?: GameParticipant[];
+  
+  // Legacy fields for backward compatibility
+  dateTime?: string; // For frontend compatibility, maps to scheduledAt
+  scheduledTime?: string; // Alternative name
+  skillLevelRequired?: string; // Maps to skillLevel
+  organizer?: User; // Maps to creator
+  players?: User[]; // Can be derived from participants
 }
 
 export interface GameParticipant {
@@ -58,7 +113,11 @@ export interface GameParticipant {
   gameId: string;
   userId: string;
   joinedAt: string;
-  status: 'confirmed' | 'pending' | 'cancelled';
+  leftAt?: string;
+  status: 'joined' | 'left' | 'kicked' | 'no_show';
+  
+  // Relations
+  game?: Game;
   user?: User;
 }
 

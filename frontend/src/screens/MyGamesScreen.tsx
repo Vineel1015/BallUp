@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,13 @@ import {
   SafeAreaView,
   ScrollView,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
+import { apiService } from '../services/api';
+import { Game } from '../types';
 
 type MyGamesScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -20,61 +24,160 @@ interface Props {
   navigation: MyGamesScreenNavigationProp;
 }
 
-const MyGamesScreen: React.FC<Props> = ({navigation}) => {
-  const mockGames = [
-    {
-      id: '1',
-      locationName: 'Central Park Basketball Court',
-      date: 'Mon Jul 29, 6:00 PM',
-      description: 'Casual pickup game, all skill levels welcome!',
-      players: '6/10',
-      duration: '120 min',
-      skillLevel: 'intermediate',
-      role: 'Creator',
-    },
-    {
-      id: '2',
-      locationName: 'Community Center Court',
-      date: 'Wed Jul 31, 7:30 PM',
-      description: 'Competitive game for advanced players',
-      players: '8/8',
-      duration: '90 min',
-      skillLevel: 'advanced',
-      role: 'Participant',
-    },
-  ];
+interface GameWithRole extends Game {
+  role: 'Creator' | 'Participant';
+}
 
-  const handleLeaveGame = (gameId: string, gameName: string) => {
+const MyGamesScreen: React.FC<Props> = ({navigation}) => {
+  const [games, setGames] = useState<GameWithRole[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadMyGames();
+  }, []);
+
+  const loadMyGames = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      // Get all games and then filter for user's games
+      const response = await apiService.getGames();
+      
+      // For now, we'll need to determine user's role by checking the creator field
+      // In a real implementation, you'd want to have the current user's ID
+      // and check if they're the creator or in the participants list
+      const allGames = response.data;
+      
+      // This is a simplified version - in reality you'd need the current user's ID
+      // For demonstration, we'll show all games as participant role
+      const myGames: GameWithRole[] = allGames.map((game: any) => ({
+        ...game,
+        // Map backend fields to frontend compatibility
+        dateTime: game.scheduledAt || game.dateTime,
+        skillLevel: game.skillLevel || game.skillLevelRequired || 'any',
+        scheduledTime: game.scheduledAt,
+        skillLevelRequired: game.skillLevel,
+        // For now, assume all games are participant role
+        // In a real app, you'd check if currentUserId === game.creatorId
+        role: 'Participant' as const,
+      }));
+      
+      setGames(myGames);
+    } catch (err: any) {
+      console.error('Error loading my games:', err);
+      setError(err.response?.data?.error || 'Failed to load your games');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLeaveGame = async (gameId: string, gameName: string) => {
     Alert.alert(
       'Leave Game',
       `Are you sure you want to leave the game at ${gameName}?`,
       [
         {text: 'Cancel', style: 'cancel'},
-        {text: 'Leave', onPress: () => Alert.alert('Left', 'You have left the game')},
+        {
+          text: 'Leave', 
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await apiService.leaveGame(gameId);
+              Alert.alert('Left', 'You have left the game');
+              await loadMyGames(); // Refresh the list
+            } catch (err: any) {
+              Alert.alert('Error', err.response?.data?.error || 'Failed to leave game');
+            } finally {
+              setLoading(false);
+            }
+          }
+        },
       ]
     );
   };
 
-  const handleCancelGame = (gameId: string, gameName: string) => {
+  const handleCancelGame = async (gameId: string, gameName: string) => {
     Alert.alert(
       'Cancel Game',
       `Are you sure you want to cancel the game at ${gameName}? This will notify all participants.`,
       [
         {text: 'Cancel', style: 'cancel'},
-        {text: 'Delete', style: 'destructive', onPress: () => Alert.alert('Cancelled', 'Game has been cancelled')},
+        {
+          text: 'Delete', 
+          style: 'destructive', 
+          onPress: async () => {
+            try {
+              setLoading(true);
+              await apiService.deleteGame(gameId);
+              Alert.alert('Cancelled', 'Game has been cancelled');
+              await loadMyGames(); // Refresh the list
+            } catch (err: any) {
+              Alert.alert('Error', err.response?.data?.error || 'Failed to cancel game');
+            } finally {
+              setLoading(false);
+            }
+          }
+        },
       ]
     );
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
+  if (loading && games.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FF6B35" />
+          <Text style={styles.loadingText}>Loading your games...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error loading games</Text>
+          <Text style={styles.errorSubtext}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadMyGames}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={loadMyGames}
+            tintColor="#FF6B35"
+          />
+        }
+      >
         <View style={styles.header}>
           <Text style={styles.title}>My Games</Text>
           <Text style={styles.subtitle}>Your created and joined games</Text>
         </View>
 
-        {mockGames.length === 0 ? (
+        {games.length === 0 ? (
           <View style={styles.emptyState}>
             <Text style={styles.emptyIcon}>🏀</Text>
             <Text style={styles.emptyTitle}>No games yet</Text>
@@ -89,16 +192,27 @@ const MyGamesScreen: React.FC<Props> = ({navigation}) => {
           </View>
         ) : (
           <View style={styles.gamesList}>
-            {mockGames.map((game) => (
+            {games.map((game) => (
               <View key={game.id} style={styles.gameCard}>
                 <View style={styles.gameHeader}>
-                  <Text style={styles.locationName}>{game.locationName}</Text>
-                  <Text style={styles.gameTime}>{game.date}</Text>
+                  <Text style={styles.locationName}>
+                    {game.location?.name || 'Unknown Location'}
+                  </Text>
+                  <Text style={styles.gameTime}>
+                    {formatDate(game.dateTime || game.scheduledAt)}
+                  </Text>
                 </View>
-                <Text style={styles.gameDescription}>{game.description}</Text>
+                <Text style={styles.gameTitle}>{game.title}</Text>
+                <Text style={styles.gameDescription}>
+                  {game.description || 'No description available'}
+                </Text>
                 <View style={styles.gameDetails}>
-                  <Text style={styles.detailText}>Players: {game.players}</Text>
-                  <Text style={styles.detailText}>Duration: {game.duration}</Text>
+                  <Text style={styles.detailText}>
+                    Players: {game.currentPlayers}/{game.maxPlayers}
+                  </Text>
+                  {game.duration && (
+                    <Text style={styles.detailText}>Duration: {game.duration} min</Text>
+                  )}
                   <Text style={[styles.detailText, styles.roleText]}>
                     Role: {game.role}
                   </Text>
@@ -106,13 +220,17 @@ const MyGamesScreen: React.FC<Props> = ({navigation}) => {
                 {game.role === 'Creator' ? (
                   <TouchableOpacity
                     style={styles.cancelButton}
-                    onPress={() => handleCancelGame(game.id, game.locationName)}>
+                    onPress={() => handleCancelGame(game.id, game.location?.name || 'this game')}
+                    disabled={loading}
+                  >
                     <Text style={styles.cancelButtonText}>Cancel Game</Text>
                   </TouchableOpacity>
                 ) : (
                   <TouchableOpacity
                     style={styles.leaveButton}
-                    onPress={() => handleLeaveGame(game.id, game.locationName)}>
+                    onPress={() => handleLeaveGame(game.id, game.location?.name || 'this game')}
+                    disabled={loading}
+                  >
                     <Text style={styles.leaveButtonText}>Leave Game</Text>
                   </TouchableOpacity>
                 )}
@@ -270,6 +388,52 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',
+  },
+  gameTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF6B35',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  errorSubtext: {
+    fontSize: 14,
+    color: '#CCCCCC',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

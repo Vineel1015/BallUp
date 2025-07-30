@@ -5,6 +5,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 ## 📱 **Core Features**
 
 ### 🎯 **Game Discovery & Management**
+
 - **Interactive Map View** - Find nearby games on a visual map with real-time locations
 - **List View** - Browse games in a detailed list format with filters
 - **Game Creation** - Organize new games with custom settings (skill level, max players, time)
@@ -12,6 +13,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 - **Game Status Tracking** - Track games as scheduled, active, completed, or cancelled
 
 ### 🗺️ **Advanced Mapping (FREE)**
+
 - **OpenStreetMap Integration** - Completely free mapping with unlimited usage
 - **Interactive Markers** - Click game markers to see details and join instantly
 - **Location Search** - Find places by name using free Nominatim geocoding
@@ -20,6 +22,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 - **Smart Performance** - Optimized rendering with marker limits and clustering
 
 ### 🏟️ **Court & Location Management**
+
 - **Court Discovery** - Browse and search basketball courts in your area
 - **Add New Courts** - Contribute new court locations with map-based selection
 - **Court Details** - View amenities, ratings, photos, and user reviews
@@ -27,6 +30,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 - **Interactive Court Selection** - Tap on map to pinpoint exact court locations
 
 ### 👤 **User Profiles & Authentication**
+
 - **Secure Registration** - Create accounts with email verification
 - **User Profiles** - Customize profiles with skill levels, preferred positions, and bio
 - **Game History** - Track your basketball activity and past games
@@ -34,6 +38,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 - **Profile Pictures** - Personalize your profile with custom photos
 
 ### 🔍 **Search & Discovery**
+
 - **Dual View Modes** - Toggle between list and map view for game discovery
 - **Advanced Filtering** - Filter games by skill level, time, location, and availability
 - **Location-Based Search** - Find games within a specific radius of your location
@@ -41,6 +46,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 - **Smart Sorting** - Games sorted by distance, time, and relevance
 
 ### 📱 **User Experience**
+
 - **Intuitive Navigation** - Clean, basketball-themed UI with easy navigation
 - **Real-Time Notifications** - Get updates about games you've joined
 - **Offline Support** - Basic functionality works without internet connection
@@ -50,6 +56,7 @@ BallUp is a comprehensive mobile application that helps basketball players find,
 ## 🏗️ **Technical Architecture**
 
 ### **Frontend (React Native)**
+
 ```
 frontend/
 ├── src/
@@ -77,6 +84,7 @@ frontend/
 ```
 
 ### **Backend (Node.js/Express)**
+
 ```
 backend/
 ├── src/
@@ -95,6 +103,7 @@ backend/
 ## 🛠️ **Technology Stack**
 
 ### **Mobile App**
+
 - **React Native 0.73** - Cross-platform mobile development
 - **TypeScript** - Type-safe JavaScript development
 - **React Navigation 6** - Screen navigation and routing
@@ -103,6 +112,7 @@ backend/
 - **Axios** - HTTP client for API communication
 
 ### **Backend API**
+
 - **Node.js 18+** - Server runtime
 - **Express.js** - Web application framework
 - **PostgreSQL** - Primary database
@@ -111,6 +121,7 @@ backend/
 - **bcrypt** - Password hashing
 
 ### **Mapping & Location**
+
 - **OpenStreetMap** - Free, unlimited mapping service
 - **Nominatim API** - Free geocoding and address lookup
 - **Device GPS** - Native location services
@@ -118,6 +129,7 @@ backend/
 ## 🚀 **Getting Started**
 
 ### **Prerequisites**
+
 - Node.js (v18 or higher)
 - PostgreSQL database
 - React Native CLI
@@ -127,36 +139,39 @@ backend/
 ### **Installation**
 
 1. **Clone the Repository**
+
    ```bash
    git clone https://github.com/your-username/ballup.git
    cd BallUp
    ```
 
 2. **Backend Setup**
+
    ```bash
    cd backend
    npm install
-   
+
    # Set up environment variables
    cp .env.example .env
    # Edit .env with your database credentials
-   
+
    # Run database migrations
    npx prisma migrate dev
    npm run dev
    ```
 
 3. **Frontend Setup**
+
    ```bash
    cd frontend
    npm install
-   
+
    # Install geolocation dependency for maps
    npm install @react-native-community/geolocation
-   
+
    # For iOS
    cd ios && pod install && cd ..
-   
+
    # Start the app
    npm start
    ```
@@ -166,9 +181,11 @@ backend/
    - Add location permissions to Android manifest
 
 ### **Development**
+
 ```bash
 # Backend (runs on http://localhost:3000)
 cd backend && npm run dev
+
 
 # Frontend (React Native Metro bundler)
 cd frontend && npm start
@@ -176,13 +193,14 @@ cd frontend && npm start
 # Run on iOS
 npm run ios
 
-# Run on Android  
+# Run on Android
 npm run android
 ```
 
 ## 🎮 **How to Use BallUp**
 
 ### **For Players**
+
 1. **Sign Up** - Create your account with email and password
 2. **Set Up Profile** - Add your skill level, preferred position, and bio
 3. **Find Games** - Use the map or list view to discover nearby games
@@ -191,6 +209,7 @@ npm run android
 6. **Track Activity** - View your joined games and basketball history
 
 ### **For Court Managers**
+
 1. **Add Courts** - Contribute new basketball court locations to the community
 2. **Update Information** - Add amenities, photos, and detailed descriptions
 3. **Verify Locations** - Help maintain accurate court information
@@ -198,11 +217,13 @@ npm run android
 ## 🗂️ **API Endpoints**
 
 ### **Authentication**
+
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh` - Refresh JWT token
 
 ### **Games**
+
 - `GET /api/games` - List all games
 - `GET /api/games/nearby?lat={lat}&lng={lng}&radius={km}` - Find nearby games
 - `POST /api/games` - Create new game
@@ -212,12 +233,14 @@ npm run android
 - `DELETE /api/games/{id}` - Cancel game
 
 ### **Locations**
+
 - `GET /api/locations` - List all courts
 - `POST /api/locations` - Add new court
 - `PUT /api/locations/{id}` - Update court information
 - `DELETE /api/locations/{id}` - Remove court
 
 ### **Users**
+
 - `GET /api/users/profile` - Get user profile
 - `PUT /api/users/profile` - Update user profile
 - `GET /api/users/{id}/games` - Get user's game history
@@ -234,17 +257,21 @@ BallUp is designed to be completely free to use:
 ## 🔧 **Configuration**
 
 ### **Map Providers**
+
 Switch between map providers in `frontend/src/config/maps.ts`:
+
 ```typescript
 export const MAPS_CONFIG = {
-  DEFAULT_PROVIDER: 'openstreetmap', // Free option (default)
-  // DEFAULT_PROVIDER: 'google',     // Paid option  
+  DEFAULT_PROVIDER: "openstreetmap", // Free option (default)
+  // DEFAULT_PROVIDER: 'google',     // Paid option
   // DEFAULT_PROVIDER: 'mapbox',     // Free tier option
 };
 ```
 
 ### **Performance Settings**
+
 Adjust performance settings for optimal experience:
+
 ```typescript
 PERFORMANCE: {
   maxZoomLevel: 18,
@@ -260,7 +287,7 @@ PERFORMANCE: {
 # Backend tests
 cd backend && npm test
 
-# Frontend tests  
+# Frontend tests
 cd frontend && npm test
 
 # Type checking

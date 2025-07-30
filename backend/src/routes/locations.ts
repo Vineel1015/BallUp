@@ -80,7 +80,7 @@ router.get('/:id', async (req: Request, res: Response) => {
             }
           },
           orderBy: {
-            scheduledTime: 'asc'
+            scheduledAt: 'asc'
           }
         }
       }

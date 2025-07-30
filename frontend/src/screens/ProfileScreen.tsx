@@ -51,25 +51,38 @@ const ProfileScreen: React.FC<Props> = ({navigation}) => {
   ];
 
   useEffect(() => {
-    // TODO: Implement fetchUserProfile when user API is available
-    // For now, set some mock data
-    setTimeout(() => {
-      setUsername('Player123');
-      setEmail('player@example.com');
-      setSkillLevel('intermediate');
-      setPosition('point_guard');
-      setBio('Love playing basketball and meeting new players!');
-      setFirstName('John');
-      setLastName('Doe');
-      setLoadingProfile(false);
-    }, 1000);
+    fetchUserProfile();
   }, []);
+
+  const fetchUserProfile = async () => {
+    try {
+      setLoadingProfile(true);
+      // TODO: Replace with actual API call when backend is ready
+      // const response = await apiService.getUserProfile();
+      // const { user } = response;
+      
+      // Mock data for development - remove when API is implemented
+      setTimeout(() => {
+        setUsername('Player123');
+        setEmail('player@example.com');
+        setSkillLevel('intermediate');
+        setPosition('point_guard');
+        setBio('Love playing basketball and meeting new players!');
+        setFirstName('John');
+        setLastName('Doe');
+        setLoadingProfile(false);
+      }, 1000);
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setLoadingProfile(false);
+    }
+  };
 
   const handleUpdateProfile = async () => {
     try {
       setLoading(true);
       
-      // TODO: Implement actual API call when user profile update API is available
+      // TODO: Replace with actual API call when backend is ready
       // const profileData = {
       //   firstName,
       //   lastName,

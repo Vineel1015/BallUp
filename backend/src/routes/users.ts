@@ -159,10 +159,10 @@ router.get('/me/games', authenticateToken, async (req: AuthRequest, res: Respons
     });
 
     // Separate games by type
-    const createdGames = allUserGames.filter(game => game.creatorId === req.user.id);
+    const createdGames = allUserGames.filter(game => game.creatorId === req.user!.id);
     const participatingGames = allUserGames.filter(
-      game => game.creatorId !== req.user.id && 
-      game.participants.some(participant => participant.userId === req.user.id)
+      game => game.creatorId !== req.user!.id && 
+      game.participants.some(participant => participant.userId === req.user!.id)
     );
 
     res.json({
@@ -189,7 +189,7 @@ router.get('/me/active-game', authenticateToken, async (req: AuthRequest, res: R
           {
             participants: {
               some: {
-                userId: req.user.id,
+                userId: req.user!.id,
                 status: 'joined' // Only joined participants, not left/kicked
               }
             }

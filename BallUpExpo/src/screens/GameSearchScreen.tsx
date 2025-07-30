@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -7,78 +7,66 @@ import {
   StyleSheet,
   SafeAreaView,
   FlatList,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {Game} from '../types';
-
-const mockGames: Game[] = [
-  {
-    id: '1',
-    locationId: '1',
-    creatorId: '1',
-    scheduledTime: '2024-07-29T18:00:00Z',
-    duration: 120,
-    maxPlayers: 10,
-    currentPlayers: 6,
-    skillLevelRequired: 'intermediate',
-    description: 'Casual pickup game, all skill levels welcome!',
-    status: 'scheduled',
-    createdAt: '2024-07-28T12:00:00Z',
-    updatedAt: '2024-07-28T12:00:00Z',
-    location: {
-      id: '1',
-      name: 'Central Park Basketball Court',
-      address: '123 Park Ave, City, State',
-      latitude: 40.7831,
-      longitude: -73.9712,
-      description: 'Outdoor court with good lighting',
-      amenities: ['lighting', 'water fountain'],
-      photos: [],
-      rating: 4.2,
-      isVerified: true,
-      createdBy: '1',
-      createdAt: '2024-07-20T12:00:00Z',
-      updatedAt: '2024-07-20T12:00:00Z',
-    },
-  },
-  {
-    id: '2',
-    locationId: '2',
-    creatorId: '2',
-    scheduledTime: '2024-07-30T19:30:00Z',
-    duration: 90,
-    maxPlayers: 8,
-    currentPlayers: 3,
-    skillLevelRequired: 'beginner',
-    description: 'Beginner-friendly game, come learn!',
-    status: 'scheduled',
-    createdAt: '2024-07-28T14:00:00Z',
-    updatedAt: '2024-07-28T14:00:00Z',
-    location: {
-      id: '2',
-      name: 'Community Center Court',
-      address: '456 Community St, City, State',
-      latitude: 40.7589,
-      longitude: -73.9851,
-      description: 'Indoor court, climate controlled',
-      amenities: ['indoor', 'parking', 'restrooms'],
-      photos: [],
-      rating: 4.5,
-      isVerified: true,
-      createdBy: '2',
-      createdAt: '2024-07-22T12:00:00Z',
-      updatedAt: '2024-07-22T12:00:00Z',
-    },
-  },
-];
+import { apiService } from '../services/api';
 
 const GameSearchScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [games] = useState(mockGames);
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Load games on component mount
+  useEffect(() => {
+    loadGames();
+  }, []);
+
+  const loadGames = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiService.getGames({ status: 'scheduled' });
+      
+      // Transform the data to ensure compatibility
+      const transformedGames = response.data.map((game: any) => ({
+        ...game,
+        // Map backend field names to frontend compatibility
+        scheduledTime: game.scheduledAt || game.scheduledTime,
+        skillLevelRequired: game.skillLevel || game.skillLevelRequired || 'any',
+      }));
+      
+      setGames(transformedGames);
+    } catch (err: any) {
+      console.error('Error loading games:', err);
+      setError(err.response?.data?.error || 'Failed to load games');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleJoinGame = async (gameId: string) => {
+    try {
+      setLoading(true);
+      await apiService.joinGame(gameId);
+      Alert.alert('Success', 'You have successfully joined the game!');
+      // Refresh the games list
+      await loadGames();
+    } catch (err: any) {
+      console.error('Error joining game:', err);
+      Alert.alert('Error', err.response?.data?.error || 'Failed to join game');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredGames = games.filter(
     game =>
       game.location?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      game.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+      game.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      game.title?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const formatDate = (dateString: string) => {
@@ -95,36 +83,76 @@ const GameSearchScreen: React.FC = () => {
   const renderGame = ({item}: {item: Game}) => (
     <TouchableOpacity style={styles.gameCard}>
       <View style={styles.gameHeader}>
-        <Text style={styles.locationName}>{item.location?.name}</Text>
-        <Text style={styles.gameTime}>{formatDate(item.scheduledTime)}</Text>
+        <Text style={styles.locationName}>{item.location?.name || 'Unknown Location'}</Text>
+        <Text style={styles.gameTime}>{formatDate(item.scheduledTime || item.scheduledAt)}</Text>
       </View>
       
-      <Text style={styles.gameDescription}>{item.description}</Text>
+      <Text style={styles.gameTitle}>{item.title}</Text>
+      <Text style={styles.gameDescription}>{item.description || 'No description available'}</Text>
       
       <View style={styles.gameDetails}>
         <Text style={styles.detailText}>
           Players: {item.currentPlayers}/{item.maxPlayers}
         </Text>
-        <Text style={styles.detailText}>
-          Duration: {item.duration} min
-        </Text>
+        {item.duration && (
+          <Text style={styles.detailText}>
+            Duration: {item.duration} min
+          </Text>
+        )}
         <Text style={styles.skillLevel}>
-          Skill: {item.skillLevelRequired}
+          Skill: {item.skillLevelRequired || item.skillLevel || 'Any'}
         </Text>
       </View>
       
-      <TouchableOpacity style={styles.joinButton}>
-        <Text style={styles.joinButtonText}>Join Game</Text>
+      <TouchableOpacity 
+        style={[
+          styles.joinButton,
+          item.currentPlayers >= item.maxPlayers && styles.fullButton
+        ]}
+        onPress={() => handleJoinGame(item.id)}
+        disabled={loading || item.currentPlayers >= item.maxPlayers}
+      >
+        <Text style={[
+          styles.joinButtonText,
+          item.currentPlayers >= item.maxPlayers && styles.fullButtonText
+        ]}>
+          {item.currentPlayers >= item.maxPlayers ? 'Full' : 'Join Game'}
+        </Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );
+
+  if (loading && games.length === 0) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#FF6B35" />
+          <Text style={styles.loadingText}>Loading games...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error loading games</Text>
+          <Text style={styles.errorSubtext}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={loadGames}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search games by location or description..."
+          placeholder="Search games by location, title, or description..."
           placeholderTextColor="#CCCCCC"
           value={searchQuery}
           onChangeText={setSearchQuery}
@@ -135,8 +163,25 @@ const GameSearchScreen: React.FC = () => {
         data={filteredGames}
         renderItem={renderGame}
         keyExtractor={item => item.id}
-        contentContainerStyle={styles.gamesList}
+        contentContainerStyle={[
+          styles.gamesList,
+          filteredGames.length === 0 && styles.emptyGamesList
+        ]}
         showsVerticalScrollIndicator={false}
+        refreshing={loading}
+        onRefresh={loadGames}
+        ListEmptyComponent={() => (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyIcon}>🏀</Text>
+            <Text style={styles.emptyTitle}>No games found</Text>
+            <Text style={styles.emptyDescription}>
+              {searchQuery 
+                ? 'Try adjusting your search criteria' 
+                : 'No scheduled games available right now'
+              }
+            </Text>
+          </View>
+        )}
       />
     </SafeAreaView>
   );
@@ -239,6 +284,82 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  gameTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  fullButton: {
+    backgroundColor: '#666666',
+  },
+  fullButtonText: {
+    color: '#CCCCCC',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FF6B35',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  errorSubtext: {
+    fontSize: 14,
+    color: '#CCCCCC',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  retryButton: {
+    backgroundColor: '#FF6B35',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  emptyGamesList: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyIcon: {
+    fontSize: 60,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  emptyDescription: {
+    fontSize: 16,
+    color: '#CCCCCC',
+    textAlign: 'center',
   },
 });
 

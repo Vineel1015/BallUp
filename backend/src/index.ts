@@ -13,6 +13,7 @@ import locationRoutes from './routes/locations';
 import gameRoutes from './routes/games';
 import userRoutes from './routes/users';
 import adminRoutes from './routes/admin';
+import adminPanelRoutes from './routes/admin-panel';
 import { setupSocketHandlers } from './services/socketService';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
@@ -108,6 +109,7 @@ app.use('/api/locations', locationRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/admin-panel', adminPanelRoutes);
 
 // Socket.IO handlers (only if Socket.IO is enabled)
 if (io && config.FEATURES.ENABLE_SOCKET_IO) {
