@@ -6,9 +6,11 @@ import {
   StyleSheet,
   SafeAreaView,
   ScrollView,
+  Platform,
 } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../navigation/AppNavigator';
+import {useWebNavigation} from '../hooks/useWebNavigation';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -16,10 +18,11 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
 >;
 
 interface Props {
-  navigation: HomeScreenNavigationProp;
+  navigation?: HomeScreenNavigationProp;
 }
 
 const HomeScreen: React.FC<Props> = ({navigation}) => {
+  const webNav = useWebNavigation();
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -31,7 +34,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
         <View style={styles.actions}>
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => navigation.navigate('GameSearch')}>
+            onPress={() => Platform.OS === 'web' ? webNav.navigate('GameSearch') : navigation?.navigate('GameSearch')}>
             <Text style={styles.actionIcon}>🔍</Text>
             <Text style={styles.actionTitle}>Find Games</Text>
             <Text style={styles.actionDescription}>
@@ -41,7 +44,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => navigation.navigate('CreateLocation')}>
+            onPress={() => Platform.OS === 'web' ? webNav.navigate('CreateLocation') : navigation?.navigate('CreateLocation')}>
             <Text style={styles.actionIcon}>📍</Text>
             <Text style={styles.actionTitle}>Add Court</Text>
             <Text style={styles.actionDescription}>
@@ -51,7 +54,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => navigation.navigate('CreateGame')}>
+            onPress={() => Platform.OS === 'web' ? webNav.navigate('CreateGame') : navigation?.navigate('CreateGame')}>
             <Text style={styles.actionIcon}>🏀</Text>
             <Text style={styles.actionTitle}>Create Game</Text>
             <Text style={styles.actionDescription}>
@@ -61,7 +64,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => navigation.navigate('Profile')}>
+            onPress={() => Platform.OS === 'web' ? webNav.navigate('Profile') : navigation?.navigate('Profile')}>
             <Text style={styles.actionIcon}>👤</Text>
             <Text style={styles.actionTitle}>My Profile</Text>
             <Text style={styles.actionDescription}>
@@ -71,7 +74,7 @@ const HomeScreen: React.FC<Props> = ({navigation}) => {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => navigation.navigate('MyGames')}>
+            onPress={() => Platform.OS === 'web' ? webNav.navigate('MyGames') : navigation?.navigate('MyGames')}>
             <Text style={styles.actionIcon}>📅</Text>
             <Text style={styles.actionTitle}>My Games</Text>
             <Text style={styles.actionDescription}>
