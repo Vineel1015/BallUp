@@ -46,7 +46,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
+            z-index: 9999;
             padding: 20px 5%;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
@@ -57,6 +57,14 @@
         .navbar.scrolled {
             padding: 15px 5%;
             background: rgba(0, 0, 0, 0.95);
+        }
+
+        .navbar.navbar-hidden {
+            transform: translateY(-100%);
+        }
+
+        .navbar.navbar-visible {
+            transform: translateY(0);
         }
 
         .nav-content {
@@ -460,6 +468,24 @@
                 display: none;
             }
 
+            /* App navigation responsiveness */
+            .app-nav > div {
+                flex-wrap: wrap;
+                gap: 15px !important;
+                justify-content: center;
+            }
+
+            .app-nav > div > a {
+                font-size: 14px;
+                padding: 5px 10px;
+            }
+
+            .app-nav .secondary-button {
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+                margin-top: 5px;
+            }
+
             .preview-container {
                 grid-template-columns: 1fr;
                 gap: 40px;
@@ -472,6 +498,25 @@
 
             .features-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-nav {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .app-nav > div {
+                flex-direction: column;
+                gap: 10px !important;
+            }
+
+            .app-nav > div > a {
+                padding: 8px 15px;
+                border-radius: 15px;
+                background: rgba(255, 255, 255, 0.1);
             }
         }
 
@@ -489,6 +534,41 @@
 
         .animate-fade-in {
             animation: fadeInUp 0.8s ease forwards;
+        }
+
+        /* Message Styles */
+        .message {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            animation: slideInRight 0.3s ease forwards;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border-left: 4px solid #20c997;
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            border-left: 4px solid #e74c3c;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* Custom Scrollbar */
@@ -697,6 +777,11 @@
             document.getElementById('app-interface').classList.add('active');
             document.body.style.overflow = 'auto';
             
+            // In app mode, always show navbar and remove scroll effects
+            const navbar = document.getElementById('navbar');
+            navbar.classList.remove('navbar-hidden');
+            navbar.classList.add('navbar-visible');
+            
             // Initialize the app if not already done
             if (!window.app) {
                 window.app = new BallUpApp();
@@ -709,6 +794,11 @@
             document.getElementById('landing-page').style.display = 'block';
             document.getElementById('app-interface').classList.remove('active');
             document.body.style.overflow = 'auto';
+            
+            // Re-enable navbar scroll effects for landing page
+            const navbar = document.getElementById('navbar');
+            navbar.classList.remove('navbar-hidden');
+            navbar.classList.add('navbar-visible');
         }
 
         // Initialize animations and scroll effects
@@ -729,6 +819,8 @@
 
         function setupScrollEffects() {
             let ticking = false;
+            let lastScrollTop = 0;
+            let navbarTimeout = null;
             
             function updateScrollEffects() {
                 const scrolled = window.scrollY;
@@ -741,6 +833,42 @@
                 } else {
                     navbar.classList.remove('scrolled');
                 }
+                
+                // Navbar hide/show logic (only on landing page, not in app mode)
+                if (!isAppMode) {
+                    if (scrolled > 100) { // Only apply hide/show after scrolling past 100px
+                        if (scrolled > lastScrollTop && scrolled > 200) {
+                            // Scrolling down - hide navbar
+                            navbar.classList.add('navbar-hidden');
+                            navbar.classList.remove('navbar-visible');
+                        } else if (scrolled < lastScrollTop) {
+                            // Scrolling up - show navbar
+                            navbar.classList.remove('navbar-hidden');
+                            navbar.classList.add('navbar-visible');
+                            
+                            // Clear any existing timeout
+                            if (navbarTimeout) {
+                                clearTimeout(navbarTimeout);
+                            }
+                            
+                            // Auto-hide after 3 seconds of no scrolling (only if not at top)
+                            if (scrolled > 200) {
+                                navbarTimeout = setTimeout(() => {
+                                    if (window.scrollY > 200 && !isAppMode) {
+                                        navbar.classList.add('navbar-hidden');
+                                        navbar.classList.remove('navbar-visible');
+                                    }
+                                }, 3000);
+                            }
+                        }
+                    } else {
+                        // Always show navbar when near top
+                        navbar.classList.remove('navbar-hidden');
+                        navbar.classList.add('navbar-visible');
+                    }
+                }
+                
+                lastScrollTop = scrolled;
                 
                 // Globe rotation based on scroll
                 if (globe && !isAppMode) {
@@ -759,6 +887,35 @@
             }
             
             window.addEventListener('scroll', requestTick);
+            
+            // Show navbar on hover when hidden (only on landing page)
+            navbar.addEventListener('mouseenter', () => {
+                if (!isAppMode && navbar.classList.contains('navbar-hidden')) {
+                    navbar.classList.remove('navbar-hidden');
+                    navbar.classList.add('navbar-visible');
+                }
+                
+                // Clear auto-hide timeout when hovering
+                if (navbarTimeout) {
+                    clearTimeout(navbarTimeout);
+                    navbarTimeout = null;
+                }
+            });
+            
+            // Set up auto-hide after mouse leaves (only if not near top and not in app mode)
+            navbar.addEventListener('mouseleave', () => {
+                if (!isAppMode && window.scrollY > 200) {
+                    navbarTimeout = setTimeout(() => {
+                        if (window.scrollY > 200 && !isAppMode) {
+                            navbar.classList.add('navbar-hidden');
+                            navbar.classList.remove('navbar-visible');
+                        }
+                    }, 2000);
+                }
+            });
+            
+            // Initialize navbar as visible
+            navbar.classList.add('navbar-visible');
         }
 
         // Smooth scrolling for navigation links

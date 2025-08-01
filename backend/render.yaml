@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: ballup-api
+    env: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ballup-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      - key: ENABLE_RATE_LIMITING
+        value: "true"
+      - key: ENABLE_LOGGING
+        value: "true"
+      - key: ENABLE_CORS
+        value: "true"
+      - key: ENABLE_HELMET
+        value: "true"
+      - key: ENABLE_COMPRESSION
+        value: "true"
+
+databases:
+  - name: ballup-db
+    databaseName: ballup
+    user: ballup
+    plan: free

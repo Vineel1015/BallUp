@@ -921,7 +921,9 @@ class BallUpApp {
     // Authentication methods
     checkAuth() {
         const userData = localStorage.getItem('rutgersballup_user');
-        if (userData) {
+        const token = localStorage.getItem('ballup_token');
+        
+        if (userData && token) {
             this.currentUser = JSON.parse(userData);
             this.isAuthenticated = true;
         }
@@ -1027,36 +1029,73 @@ class BallUpApp {
         `;
     }
     
-    handleLogin(event) {
+    async handleLogin(event) {
         event.preventDefault();
         
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
         
-        // Simple demo authentication
-        if (email && password) {
-            this.currentUser = {
-                id: Date.now().toString(),
-                email: email,
-                username: email.split('@')[0],
-                skillLevel: 'intermediate',
-                position: 'Shooting Guard',
-                bio: 'Love playing basketball and meeting new people!',
-                joinedGames: [],
-                createdGames: []
-            };
+        if (!email || !password) {
+            this.showMessage('Please enter both email and password', 'error');
+            return;
+        }
+
+        try {
+            // Show loading state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Signing In...';
+            submitButton.disabled = true;
+
+            // Call backend authentication API
+            const response = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.token) {
+                // Store token and user data
+                localStorage.setItem('ballup_token', data.token);
+                localStorage.setItem('rutgersballup_user', JSON.stringify(data.user));
+                
+                this.currentUser = data.user;
+                this.isAuthenticated = true;
+                
+                this.showMessage('Successfully signed in!', 'success');
+                
+                // Check if user is admin and redirect accordingly
+                if (data.user.role === 'admin' || data.user.role === 'super_admin') {
+                    setTimeout(() => {
+                        window.location.href = '/admin.html';
+                    }, 1000);
+                } else {
+                    setTimeout(() => this.navigateTo('dashboard'), 1000);
+                }
+            } else {
+                this.showMessage(data.error || 'Login failed. Please check your credentials.', 'error');
+            }
+
+            // Reset button state
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+
+        } catch (error) {
+            console.error('Login error:', error);
+            this.showMessage('Network error. Please try again.', 'error');
             
-            localStorage.setItem('rutgersballup_user', JSON.stringify(this.currentUser));
-            this.isAuthenticated = true;
-            
-            this.showMessage('Successfully signed in!', 'success');
-            setTimeout(() => this.navigateTo('dashboard'), 1000);
-        } else {
-            this.showMessage('Please enter valid credentials', 'error');
+            // Reset button state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Sign In';
+            submitButton.disabled = false;
         }
     }
     
-    handleRegister(event) {
+    async handleRegister(event) {
         event.preventDefault();
         
         const username = document.getElementById('register-username').value;
@@ -1069,34 +1108,69 @@ class BallUpApp {
             return;
         }
         
-        if (username && email && password) {
-            this.currentUser = {
-                id: Date.now().toString(),
-                email: email,
-                username: username,
-                skillLevel: 'beginner',
-                position: '',
-                bio: '',
-                joinedGames: [],
-                createdGames: []
-            };
-            
-            localStorage.setItem('ballup_user', JSON.stringify(this.currentUser));
-            this.isAuthenticated = true;
-            
-            this.showMessage('Account created successfully!', 'success');
-            setTimeout(() => this.navigateTo('dashboard'), 1000);
-        } else {
+        if (!username || !email || !password) {
             this.showMessage('Please fill in all fields', 'error');
+            return;
+        }
+
+        try {
+            // Show loading state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Creating Account...';
+            submitButton.disabled = true;
+
+            // Call backend registration API
+            const response = await fetch('http://localhost:3000/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.token) {
+                // Store token and user data
+                localStorage.setItem('ballup_token', data.token);
+                localStorage.setItem('rutgersballup_user', JSON.stringify(data.user));
+                
+                this.currentUser = data.user;
+                this.isAuthenticated = true;
+                
+                this.showMessage('Account created successfully!', 'success');
+                setTimeout(() => this.navigateTo('dashboard'), 1000);
+            } else {
+                this.showMessage(data.error || 'Registration failed. Please try again.', 'error');
+            }
+
+            // Reset button state
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+
+        } catch (error) {
+            console.error('Registration error:', error);
+            this.showMessage('Network error. Please check if the backend server is running.', 'error');
+            
+            // Reset button state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Create Account';
+            submitButton.disabled = false;
         }
     }
     
     logout() {
         localStorage.removeItem('rutgersballup_user');
+        localStorage.removeItem('ballup_token');
         this.currentUser = null;
         this.isAuthenticated = false;
         this.showLanding();
-        this.showMessage('Logged out successfully', 'success');
+        
+        // Show success message after a brief delay to ensure landing page is loaded
+        setTimeout(() => {
+            this.showMessage('Logged out successfully', 'success');
+        }, 100);
     }
     
     // My Games section

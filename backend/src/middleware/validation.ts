@@ -69,9 +69,10 @@ export const validateCreateGame: ValidationChain[] = [
     .escape()
     .withMessage('Description must be max 500 characters'),
   body('locationId')
-    .isUUID()
+    .isLength({ min: 20, max: 30 })
+    .matches(/^c[a-z0-9]+$/)
     .withMessage('Valid location ID is required'),
-  body('scheduledAt')
+  body('scheduledTime')
     .isISO8601()
     .toDate()
     .custom((value) => {
@@ -100,7 +101,8 @@ export const validateCreateGame: ValidationChain[] = [
 
 export const validateUpdateGame: ValidationChain[] = [
   param('id')
-    .isUUID()
+    .isLength({ min: 20, max: 30 })
+    .matches(/^c[a-z0-9]+$/)
     .withMessage('Valid game ID is required'),
   body('title')
     .optional()
@@ -185,7 +187,8 @@ export const validateCreateLocation: ValidationChain[] = [
 
 export const validateUpdateLocation: ValidationChain[] = [
   param('id')
-    .isUUID()
+    .isLength({ min: 20, max: 30 })
+    .matches(/^c[a-z0-9]+$/)
     .withMessage('Valid location ID is required'),
   body('name')
     .optional()
@@ -270,8 +273,9 @@ export const validateGameFilters: ValidationChain[] = [
     .withMessage('Skill level must be beginner, intermediate, advanced, or any'),
   query('locationId')
     .optional()
-    .isUUID()
-    .withMessage('Location ID must be a valid UUID'),
+    .isLength({ min: 20, max: 30 })
+    .matches(/^c[a-z0-9]+$/)
+    .withMessage('Location ID must be a valid CUID'),
   query('status')
     .optional()
     .isIn(['scheduled', 'starting', 'active', 'completed', 'cancelled'])
@@ -289,6 +293,7 @@ export const validateGameFilters: ValidationChain[] = [
 // UUID parameter validation
 export const validateUUIDParam = (paramName: string): ValidationChain => {
   return param(paramName)
-    .isUUID()
+    .isLength({ min: 20, max: 30 })
+    .matches(/^c[a-z0-9]+$/)
     .withMessage(`Valid ${paramName} is required`);
 };

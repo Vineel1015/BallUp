@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BallUp - Quick Start</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #FF6B35 0%, #000000 100%);
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+        .status {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            gap: 20px;
+        }
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            flex: 1;
+        }
+        .status-good { border-left: 4px solid #4CAF50; }
+        .status-bad { border-left: 4px solid #f44336; }
+        .launch-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+        .launch-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+        }
+        .info-btn {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .info-btn:hover {
+            background: white;
+            color: #FF6B35;
+        }
+        .code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏀 BallUp</h1>
+        <p>Your basketball pickup game platform is ready!</p>
+        
+        <div class="status">
+            <div class="status-item status-good">
+                <strong>Backend</strong><br>
+                ✅ Running on port 3000
+            </div>
+            <div class="status-item status-good">
+                <strong>Frontend</strong><br>
+                ✅ Running on port 8080
+            </div>
+        </div>
+        
+        <a href="http://localhost:8080" class="launch-btn" target="_blank">
+            🚀 Launch BallUp App
+        </a>
+        
+        <br><br>
+        
+        <h3>Quick Links:</h3>
+        <a href="http://localhost:3000/health" class="info-btn" target="_blank">Backend Health</a>
+        <a href="http://localhost:3000/api/admin" class="info-btn" target="_blank">Admin Panel</a>
+        
+        <br><br>
+        
+        <h3>How to Use:</h3>
+        <ol style="text-align: left; max-width: 400px; margin: 0 auto;">
+            <li><strong>Click "Launch BallUp App"</strong> above</li>
+            <li><strong>Register</strong> a new account or <strong>login</strong></li>
+            <li><strong>Explore features:</strong>
+                <ul>
+                    <li>Find and join games</li>
+                    <li>Create new games</li>
+                    <li>Add basketball courts</li>
+                    <li>Manage your profile</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <br>
+        
+        <h3>Developers:</h3>
+        <div class="code">Backend: http://localhost:3000</div>
+        <div class="code">Frontend: http://localhost:8080</div>
+        
+        <p style="margin-top: 30px; opacity: 0.8; font-size: 0.9rem;">
+            All buttons are fully functional and connected to the backend database!
+        </p>
+    </div>
+    
+    <script>
+        // Check if servers are running
+        function checkServers() {
+            Promise.all([
+                fetch('http://localhost:3000/health').catch(() => false),
+                fetch('http://localhost:8080').catch(() => false)
+            ]).then(results => {
+                const backendStatus = document.querySelector('.status-item:first-child');
+                const frontendStatus = document.querySelector('.status-item:last-child');
+                
+                if (!results[0]) {
+                    backendStatus.className = 'status-item status-bad';
+                    backendStatus.innerHTML = '<strong>Backend</strong><br>❌ Not running';
+                }
+                
+                if (!results[1]) {
+                    frontendStatus.className = 'status-item status-bad';
+                    frontendStatus.innerHTML = '<strong>Frontend</strong><br>❌ Not running';
+                }
+            });
+        }
+        
+        // Check server status every 10 seconds
+        setInterval(checkServers, 10000);
+    </script>
+</body>
+</html>
