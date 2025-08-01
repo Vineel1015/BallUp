@@ -1,5 +1,7 @@
 import React from 'react';
+import {Platform} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {Routes, Route, Navigate} from 'react-router-dom';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -23,6 +25,22 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
+  if (Platform.OS === 'web') {
+    return (
+      <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<LoginScreen />} />
+        <Route path="/register" element={<RegisterScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
+        <Route path="/games" element={<GameSearchScreen />} />
+        <Route path="/create-location" element={<CreateLocationScreen />} />
+        <Route path="/profile" element={<ProfileScreen />} />
+        <Route path="/my-games" element={<MyGamesScreen />} />
+        <Route path="/create-game" element={<CreateGameScreen />} />
+      </Routes>
+    );
+  }
+
   return (
     <Stack.Navigator initialRouteName="Login">
       <Stack.Screen 
