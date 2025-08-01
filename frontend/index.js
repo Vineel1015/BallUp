@@ -3,3 +3,4 @@ import App from './src/App';
 import {name as appName} from './package.json';
 
 AppRegistry.registerComponent(appName, () => App);
+//test
