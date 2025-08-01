@@ -15,6 +15,9 @@ const optionalEnvVars = [
   'FRONTEND_URL',
   'WEB_DEMO_URL',
   'LOG_LEVEL',
+  'SUPABASE_URL',
+  'SUPABASE_ANON_KEY',
+  'SUPABASE_SERVICE_ROLE_KEY',
   'RATE_LIMIT_WINDOW_MS',
   'RATE_LIMIT_MAX_REQUESTS',
   'AUTH_RATE_LIMIT_WINDOW_MS',
@@ -70,6 +73,11 @@ interface EnvironmentConfig {
   
   // Database
   DATABASE_URL: string;
+  
+  // Supabase (optional)
+  SUPABASE_URL?: string;
+  SUPABASE_ANON_KEY?: string;
+  SUPABASE_SERVICE_ROLE_KEY?: string;
   
   // Authentication
   JWT_SECRET: string;
@@ -139,6 +147,10 @@ function createConfig(): EnvironmentConfig {
     PORT: parseInt(process.env.PORT || '3000', 10),
     
     DATABASE_URL: process.env.DATABASE_URL!,
+    
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     
     JWT_SECRET: process.env.JWT_SECRET!,
     JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',

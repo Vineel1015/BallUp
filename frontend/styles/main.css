@@ -1,4 +1,4 @@
-/* RutgersBallUp Web App Styles */
+/* RutgersBallUp Frontend - Main Styles */
 
 /* App Interface Styles */
 .app-interface {
@@ -495,7 +495,7 @@
 }
 
 .search-address-btn {
-    background: var(--secondary-button-bg);
+    background: transparent;
     border: 2px solid var(--primary-orange);
     border-radius: 8px;
     padding: 8px 15px;
@@ -732,7 +732,8 @@
     width: 100%;
 }
 
-.empty-state {
+/* State Messages */
+.empty-state, .loading-message, .error-state {
     text-align: center;
     padding: 60px 20px;
     background: var(--glass-bg);
@@ -743,50 +744,36 @@
     font-size: 1.1rem;
 }
 
-.empty-state a {
+.empty-state a, .error-state a {
     color: var(--primary-orange);
     text-decoration: none;
     font-weight: 600;
 }
 
-.empty-state a:hover {
+.empty-state a:hover, .error-state a:hover {
     text-decoration: underline;
 }
 
-/* Message Styles */
-.message {
-    position: fixed;
-    top: 100px;
-    right: 30px;
-    padding: 15px 25px;
-    border-radius: 10px;
-    font-weight: 600;
-    z-index: 1000;
-    animation: slideIn 0.3s ease;
-    max-width: 400px;
+.loading-message {
+    color: var(--primary-orange);
 }
 
-.message.success {
-    background: rgba(76, 175, 80, 0.1);
-    border: 1px solid rgba(76, 175, 80, 0.3);
-    color: #4CAF50;
-}
-
-.message.error {
-    background: rgba(244, 67, 54, 0.1);
-    border: 1px solid rgba(244, 67, 54, 0.3);
+.error-state {
     color: #f44336;
 }
 
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
+/* Button disabled state */
+.primary-button:disabled,
+.secondary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.primary-button:disabled:hover,
+.secondary-button:disabled:hover {
+    transform: none;
+    box-shadow: none;
 }
 
 /* Responsive Design */
@@ -813,6 +800,13 @@
     .app-nav {
         flex-direction: column;
         gap: 20px;
+    }
+    
+    .app-nav > div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
     }
     
     .games-header {
@@ -874,5 +868,29 @@
     .locations-form-container,
     .profile-form-container {
         padding: 25px;
+    }
+    
+    .app-nav {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .app-nav > div {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .app-nav > div > a {
+        padding: 8px 15px;
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        font-size: 14px;
+    }
+    
+    .app-nav .secondary-button {
+        padding: 6px 12px;
+        font-size: 12px;
+        margin-top: 5px;
     }
 }
