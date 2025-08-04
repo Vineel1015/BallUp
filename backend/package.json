@@ -4,7 +4,7 @@
   "description": "Real-time basketball pickup game platform API",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf dist && tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "migrate": "prisma migrate dev",
@@ -18,8 +18,8 @@
     "test:supabase": "node scripts/test-supabase.js",
     "validate:env": "node scripts/validate-env.js",
     "setup:supabase": "node scripts/setup-supabase-functions.js",
-    "deploy": "npm run build && npm run migrate",
-    "postinstall": "prisma generate"
+    "deploy": "npm run generate && npm run build",
+    "postinstall": "npm run generate"
   },
   "keywords": [
     "basketball",
